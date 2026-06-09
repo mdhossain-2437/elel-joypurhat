@@ -1,0 +1,11 @@
+<svg width="520" height="140" viewBox="0 0 520 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="520" height="140" rx="18" fill="white"/>
+  <g transform="translate(24 24)">
+    <rect x="0" y="0" width="88" height="88" rx="18" fill="#111111"/>
+    <path d="M22 58V22h42v12H36v8h25v11H36v9h30v12H22z" fill="#FF5A1F"/>
+    <path d="M44 22h22v14H52v38H38V36H22V22h22z" fill="white" fill-opacity=".92"/>
+  </g>
+  <text x="128" y="54" fill="#111111" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="900" letter-spacing="-0.5">E-Learning &amp; Earning</text>
+  <text x="128" y="84" fill="#FF5A1F" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="800">Joypurhat Branch</text>
+  <text x="128" y="111" fill="#666666" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700">Freelancing, IT Training &amp; Career Courses</text>
+</svg>

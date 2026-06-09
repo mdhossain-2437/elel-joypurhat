@@ -1,0 +1,559 @@
+import "server-only";
+
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import type {
+  AdmissionResultEntry,
+  CmsStore,
+  CourseEntry,
+  MediaAssetEntry,
+  MonthlyResultEntry,
+  NoticeEntry,
+  PublicAdmissionResult,
+  SiteSettings,
+  TeamMemberEntry,
+} from "@/lib/cms-types";
+
+const storePath = path.join(process.cwd(), "data", "cms-store.json");
+export type CmsActionCollection =
+  | "notices"
+  | "courses"
+  | "teamMembers"
+  | "mediaAssets"
+  | "admissionResults"
+  | "monthlyResults";
+
+function now() {
+  return new Date().toISOString();
+}
+
+function normalizePhone(phone: string) {
+  return phone.replace(/\D/g, "");
+}
+
+function newId(prefix: string) {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+export async function readCmsStore(): Promise<CmsStore> {
+  const raw = await readFile(storePath, "utf8");
+  const store = JSON.parse(raw) as CmsStore;
+  return normalizeStore(store);
+}
+
+export async function writeCmsStore(store: CmsStore) {
+  await mkdir(path.dirname(storePath), { recursive: true });
+  store.updatedAt = now();
+  await writeFile(storePath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
+  return store;
+}
+
+export async function addAuditLog(actor: string, action: string, target: string, meta?: string) {
+  const store = await readCmsStore();
+  store.auditLogs.unshift({
+    id: newId("audit"),
+    actor,
+    action,
+    target,
+    createdAt: now(),
+    meta,
+  });
+  store.auditLogs = store.auditLogs.slice(0, 100);
+  await writeCmsStore(store);
+}
+
+export function sanitizeCmsStore(store: CmsStore) {
+  return {
+    ...store,
+    admins: store.admins.map((admin) => ({
+      id: admin.id,
+      name: admin.name,
+      email: admin.email,
+      role: admin.role,
+      status: admin.status,
+      createdAt: admin.createdAt,
+      lastLoginAt: admin.lastLoginAt,
+    })),
+  };
+}
+
+function normalizeStore(store: CmsStore): CmsStore {
+  return {
+    ...store,
+    teamMembers: store.teamMembers || [],
+    mediaAssets: store.mediaAssets || [],
+    auditLogs: store.auditLogs || [],
+  };
+}
+
+function actionName(collection: CmsActionCollection, mode: "DELETE" | "ARCHIVE" | "PUBLISH") {
+  const names: Record<CmsActionCollection, string> = {
+    notices: "NOTICE",
+    courses: "COURSE",
+    teamMembers: "TEAM_MEMBER",
+    mediaAssets: "MEDIA_ASSET",
+    admissionResults: "ADMISSION_RESULT",
+    monthlyResults: "MONTHLY_RESULT",
+  };
+  return `${mode}_${names[collection]}`;
+}
+
+export async function deleteCmsEntry(collection: CmsActionCollection, id: string, actor: string) {
+  const store = await readCmsStore();
+  const timestamp = now();
+  let deleted = false;
+
+  if (collection === "notices") {
+    const before = store.notices.length;
+    store.notices = store.notices.filter((item) => item.id !== id);
+    deleted = store.notices.length !== before;
+  }
+
+  if (collection === "courses") {
+    const before = store.courses.length;
+    store.courses = store.courses.filter((item) => item.id !== id);
+    deleted = store.courses.length !== before;
+  }
+
+  if (collection === "teamMembers") {
+    const before = store.teamMembers.length;
+    store.teamMembers = store.teamMembers.filter((item) => item.id !== id);
+    deleted = store.teamMembers.length !== before;
+  }
+
+  if (collection === "mediaAssets") {
+    const before = store.mediaAssets.length;
+    store.mediaAssets = store.mediaAssets.filter((item) => item.id !== id);
+    deleted = store.mediaAssets.length !== before;
+  }
+
+  if (collection === "admissionResults") {
+    const before = store.admissionResults.length;
+    store.admissionResults = store.admissionResults.filter((item) => item.id !== id);
+    deleted = store.admissionResults.length !== before;
+  }
+
+  if (collection === "monthlyResults") {
+    const before = store.monthlyResults.length;
+    store.monthlyResults = store.monthlyResults.filter((item) => item.id !== id);
+    deleted = store.monthlyResults.length !== before;
+  }
+
+  if (!deleted) return { deleted: false };
+
+  store.auditLogs.unshift({
+    id: newId("audit"),
+    actor,
+    action: actionName(collection, "DELETE"),
+    target: id,
+    createdAt: timestamp,
+    meta: "মুছে ফেলা হয়েছে",
+  });
+
+  await writeCmsStore(store);
+  return { deleted: true };
+}
+
+export async function archiveCmsEntry(collection: CmsActionCollection, id: string, actor: string) {
+  const store = await readCmsStore();
+  const timestamp = now();
+  let changed = false;
+
+  if (collection === "notices" || collection === "teamMembers" || collection === "mediaAssets") {
+    const item = store[collection].find((entry) => entry.id === id);
+    if (item) {
+      item.status = "ARCHIVED";
+      item.updatedAt = timestamp;
+      changed = true;
+    }
+  }
+
+  if (collection === "courses") {
+    const item = store.courses.find((entry) => entry.id === id);
+    if (item) {
+      item.featured = false;
+      item.status = "আর্কাইভে রাখা হয়েছে";
+      item.updatedAt = timestamp;
+      changed = true;
+    }
+  }
+
+  if (collection === "admissionResults" || collection === "monthlyResults") {
+    const item = store[collection].find((entry) => entry.id === id);
+    if (item) {
+      item.published = false;
+      item.updatedAt = timestamp;
+      changed = true;
+    }
+  }
+
+  if (!changed) return { archived: false };
+
+  store.auditLogs.unshift({
+    id: newId("audit"),
+    actor,
+    action: actionName(collection, "ARCHIVE"),
+    target: id,
+    createdAt: timestamp,
+    meta: "পাবলিক ভিউ থেকে সরানো হয়েছে",
+  });
+
+  await writeCmsStore(store);
+  return { archived: true };
+}
+
+export async function publishCmsEntry(collection: CmsActionCollection, id: string, actor: string) {
+  const store = await readCmsStore();
+  const timestamp = now();
+  let changed = false;
+
+  if (collection === "notices" || collection === "teamMembers" || collection === "mediaAssets") {
+    const item = store[collection].find((entry) => entry.id === id);
+    if (item) {
+      item.status = "PUBLISHED";
+      item.updatedAt = timestamp;
+      changed = true;
+    }
+  }
+
+  if (collection === "courses") {
+    const item = store.courses.find((entry) => entry.id === id);
+    if (item) {
+      item.featured = true;
+      item.updatedAt = timestamp;
+      changed = true;
+    }
+  }
+
+  if (collection === "admissionResults" || collection === "monthlyResults") {
+    const item = store[collection].find((entry) => entry.id === id);
+    if (item) {
+      item.published = true;
+      item.updatedAt = timestamp;
+      changed = true;
+    }
+  }
+
+  if (!changed) return { published: false };
+
+  store.auditLogs.unshift({
+    id: newId("audit"),
+    actor,
+    action: actionName(collection, "PUBLISH"),
+    target: id,
+    createdAt: timestamp,
+    meta: "প্রকাশিত",
+  });
+
+  await writeCmsStore(store);
+  return { published: true };
+}
+
+export async function getPublishedNotices() {
+  const store = await readCmsStore();
+  return store.notices
+    .filter((notice) => notice.status === "PUBLISHED")
+    .toSorted((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
+export async function getCourses() {
+  const store = await readCmsStore();
+  return store.courses.toSorted((a, b) => Number(b.featured) - Number(a.featured));
+}
+
+export async function getPublishedTeamMembers() {
+  const store = await readCmsStore();
+  return store.teamMembers
+    .filter((member) => member.status === "PUBLISHED")
+    .toSorted((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
+}
+
+export async function getPublishedMediaAssets() {
+  const store = await readCmsStore();
+  return store.mediaAssets
+    .filter((asset) => asset.status === "PUBLISHED")
+    .toSorted((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
+export function withMerit(rows: AdmissionResultEntry[]): PublicAdmissionResult[] {
+  let previousTotal: number | null = null;
+  let previousMerit = 0;
+
+  return rows
+    .filter((row) => row.published)
+    .toSorted((a, b) => b.written + b.viva - (a.written + a.viva))
+    .map((row, index) => {
+      const total = row.written + row.viva;
+      const merit = previousTotal === total ? previousMerit : index + 1;
+      previousTotal = total;
+      previousMerit = merit;
+      return { ...row, total, merit };
+    });
+}
+
+export async function findAdmissionResult(roll: string, phone: string) {
+  const store = await readCmsStore();
+  const normalizedPhone = normalizePhone(phone);
+
+  return withMerit(store.admissionResults).find(
+    (row) => row.roll.toLowerCase() === roll.trim().toLowerCase() && normalizePhone(row.phone) === normalizedPhone,
+  );
+}
+
+export async function findMonthlyResults(phone: string) {
+  const store = await readCmsStore();
+  const normalizedPhone = normalizePhone(phone);
+
+  return store.monthlyResults
+    .filter((row) => row.published && normalizePhone(row.phone) === normalizedPhone)
+    .toSorted((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
+export async function upsertNotice(input: Partial<NoticeEntry>, actor: string) {
+  const store = await readCmsStore();
+  const timestamp = now();
+  const id = input.id || newId("notice");
+  const existingIndex = store.notices.findIndex((notice) => notice.id === id);
+  const nextNotice: NoticeEntry = {
+    id,
+    title: input.title?.trim() || "শিরোনামহীন নোটিশ",
+    date: input.date?.trim() || timestamp.slice(0, 10),
+    type: input.type?.trim() || "সাধারণ",
+    status: input.status || "DRAFT",
+    detail: input.detail?.trim() || "নোটিশের বিস্তারিত এখনো লেখা হয়নি।",
+    href: input.href?.trim() || "/notices",
+    createdAt: existingIndex >= 0 ? store.notices[existingIndex].createdAt : timestamp,
+    updatedAt: timestamp,
+  };
+
+  if (existingIndex >= 0) {
+    store.notices[existingIndex] = nextNotice;
+  } else {
+    store.notices.unshift(nextNotice);
+  }
+
+  store.auditLogs.unshift({
+    id: newId("audit"),
+    actor,
+    action: existingIndex >= 0 ? "UPDATE_NOTICE" : "CREATE_NOTICE",
+    target: id,
+    createdAt: timestamp,
+    meta: nextNotice.status,
+  });
+
+  await writeCmsStore(store);
+  return nextNotice;
+}
+
+export async function upsertCourse(input: Partial<CourseEntry>, actor: string) {
+  const store = await readCmsStore();
+  const timestamp = now();
+  const id = input.id || newId("course");
+  const existingIndex = store.courses.findIndex((course) => course.id === id);
+  const nextCourse: CourseEntry = {
+    id,
+    type: input.type?.trim() || "কোর্স",
+    title: input.title?.trim() || "শিরোনামহীন কোর্স",
+    status: input.status?.trim() || "খসড়া",
+    detail: input.detail?.trim() || "কোর্সের বিস্তারিত এখনো লেখা হয়নি।",
+    href: input.href?.trim() || "/courses",
+    featured: Boolean(input.featured),
+    updatedAt: timestamp,
+  };
+
+  if (existingIndex >= 0) {
+    store.courses[existingIndex] = nextCourse;
+  } else {
+    store.courses.unshift(nextCourse);
+  }
+
+  store.auditLogs.unshift({
+    id: newId("audit"),
+    actor,
+    action: existingIndex >= 0 ? "UPDATE_COURSE" : "CREATE_COURSE",
+    target: id,
+    createdAt: timestamp,
+    meta: nextCourse.status,
+  });
+
+  await writeCmsStore(store);
+  return nextCourse;
+}
+
+export async function updateSettings(input: Partial<SiteSettings>, actor: string) {
+  const store = await readCmsStore();
+  const timestamp = now();
+  const nextSettings: SiteSettings = {
+    siteName: input.siteName?.trim() || store.settings.siteName,
+    tagline: input.tagline?.trim() || store.settings.tagline,
+    admissionStatus: input.admissionStatus?.trim() || store.settings.admissionStatus,
+    activeBatch: input.activeBatch?.trim() || store.settings.activeBatch,
+    seoTitle: input.seoTitle?.trim() || store.settings.seoTitle,
+    seoDescription: input.seoDescription?.trim() || store.settings.seoDescription,
+    maintenanceMode: input.maintenanceMode ?? store.settings.maintenanceMode,
+  };
+
+  store.settings = nextSettings;
+  store.auditLogs.unshift({
+    id: newId("audit"),
+    actor,
+    action: "UPDATE_SITE_SETTINGS",
+    target: "settings",
+    createdAt: timestamp,
+    meta: nextSettings.activeBatch,
+  });
+
+  await writeCmsStore(store);
+  return nextSettings;
+}
+
+export async function upsertTeamMember(input: Partial<TeamMemberEntry>, actor: string) {
+  const store = await readCmsStore();
+  const timestamp = now();
+  const slugSource = input.name || newId("member");
+  const id = input.id || `team-${slugSource.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const existingIndex = store.teamMembers.findIndex((member) => member.id === id);
+  const nextMember: TeamMemberEntry = {
+    id,
+    name: input.name?.trim() || "নতুন টিম সদস্য",
+    role: input.role?.trim() || "টিম সদস্য",
+    org: input.org?.trim() || "ই-লার্নিং এন্ড আর্নিং লিমিটেড, জয়পুরহাট ব্রাঞ্চ",
+    category: input.category || "TRAINER",
+    image: input.image?.trim() || "/media/elogo.png",
+    status: input.status || "DRAFT",
+    sortOrder: Number(input.sortOrder ?? store.teamMembers.length + 1),
+    bio: input.bio?.trim() || "ব্রাঞ্চ টিমের সংক্ষিপ্ত পরিচিতি।",
+    updatedAt: timestamp,
+  };
+
+  if (existingIndex >= 0) {
+    store.teamMembers[existingIndex] = nextMember;
+  } else {
+    store.teamMembers.push(nextMember);
+  }
+
+  store.auditLogs.unshift({
+    id: newId("audit"),
+    actor,
+    action: existingIndex >= 0 ? "UPDATE_TEAM_MEMBER" : "CREATE_TEAM_MEMBER",
+    target: id,
+    createdAt: timestamp,
+    meta: nextMember.status,
+  });
+
+  await writeCmsStore(store);
+  return nextMember;
+}
+
+export async function upsertMediaAsset(input: Partial<MediaAssetEntry>, actor: string) {
+  const store = await readCmsStore();
+  const timestamp = now();
+  const slugSource = input.title || newId("asset");
+  const id = input.id || `media-${slugSource.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const existingIndex = store.mediaAssets.findIndex((asset) => asset.id === id);
+  const nextAsset: MediaAssetEntry = {
+    id,
+    title: input.title?.trim() || "শিরোনামহীন মিডিয়া",
+    kind: input.kind || "IMAGE",
+    url: input.url?.trim() || "/media/elogo.png",
+    alt: input.alt?.trim() || input.title?.trim() || "ই-লার্নিং এন্ড আর্নিং জয়পুরহাট মিডিয়া",
+    status: input.status || "DRAFT",
+    usedIn: input.usedIn?.trim() || "মিডিয়া লাইব্রেরি",
+    updatedAt: timestamp,
+  };
+
+  if (existingIndex >= 0) {
+    store.mediaAssets[existingIndex] = nextAsset;
+  } else {
+    store.mediaAssets.unshift(nextAsset);
+  }
+
+  store.auditLogs.unshift({
+    id: newId("audit"),
+    actor,
+    action: existingIndex >= 0 ? "UPDATE_MEDIA_ASSET" : "CREATE_MEDIA_ASSET",
+    target: id,
+    createdAt: timestamp,
+    meta: nextAsset.kind,
+  });
+
+  await writeCmsStore(store);
+  return nextAsset;
+}
+
+export async function upsertAdmissionResult(input: Partial<AdmissionResultEntry>, actor: string) {
+  const store = await readCmsStore();
+  const timestamp = now();
+  const id = input.id || `admission-${(input.roll || newId("roll")).toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const existingIndex = store.admissionResults.findIndex((row) => row.id === id || row.roll === input.roll);
+  const nextResult: AdmissionResultEntry = {
+    id,
+    roll: input.roll?.trim() || "JYP-0000",
+    phone: input.phone?.trim() || "",
+    name: input.name?.trim() || "নামহীন প্রার্থী",
+    written: Number(input.written || 0),
+    viva: Number(input.viva || 0),
+    status: input.status || "Waiting",
+    published: Boolean(input.published),
+    batch: input.batch?.trim() || "৭ম ব্যাচ",
+    updatedAt: timestamp,
+  };
+
+  if (existingIndex >= 0) {
+    store.admissionResults[existingIndex] = nextResult;
+  } else {
+    store.admissionResults.unshift(nextResult);
+  }
+
+  store.auditLogs.unshift({
+    id: newId("audit"),
+    actor,
+    action: "PUBLISH_ADMISSION_RESULT",
+    target: nextResult.roll,
+    createdAt: timestamp,
+    meta: nextResult.published ? "প্রকাশিত" : "খসড়া",
+  });
+
+  await writeCmsStore(store);
+  return nextResult;
+}
+
+export async function upsertMonthlyResult(input: Partial<MonthlyResultEntry>, actor: string) {
+  const store = await readCmsStore();
+  const timestamp = now();
+  const id =
+    input.id ||
+    `monthly-${normalizePhone(input.phone || "")}-${(input.month || "month").toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${(input.subject || "subject").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const existingIndex = store.monthlyResults.findIndex((row) => row.id === id);
+  const nextResult: MonthlyResultEntry = {
+    id,
+    phone: input.phone?.trim() || "",
+    name: input.name?.trim() || "নামহীন শিক্ষার্থী",
+    batch: input.batch?.trim() || "৬ষ্ঠ ব্যাচ",
+    month: input.month?.trim() || "জুন ২০২৬",
+    subject: input.subject?.trim() || "ক্লাস টেস্ট",
+    score: Number(input.score || 0),
+    maxScore: Number(input.maxScore || 100),
+    grade: input.grade?.trim() || "প্রযোজ্য নয়",
+    published: Boolean(input.published),
+    updatedAt: timestamp,
+  };
+
+  if (existingIndex >= 0) {
+    store.monthlyResults[existingIndex] = nextResult;
+  } else {
+    store.monthlyResults.unshift(nextResult);
+  }
+
+  store.auditLogs.unshift({
+    id: newId("audit"),
+    actor,
+    action: "PUBLISH_MONTHLY_RESULT",
+    target: `${nextResult.phone}-${nextResult.subject}`,
+    createdAt: timestamp,
+    meta: nextResult.published ? "প্রকাশিত" : "খসড়া",
+  });
+
+  await writeCmsStore(store);
+  return nextResult;
+}
