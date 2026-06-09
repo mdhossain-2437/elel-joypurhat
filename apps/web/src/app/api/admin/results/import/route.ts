@@ -74,6 +74,21 @@ function normalizeAdmissionStatus(value?: string): AdmissionResultEntry["status"
   return "Waiting";
 }
 
+function normalizeLab(value?: string): MonthlyResultEntry["lab"] {
+  const normalized = (value || "").trim().toLowerCase();
+  if (["lab b", "b", "ল্যাব বি", "ল্যাব b"].includes(normalized)) return "Lab B";
+  if (["lab c", "c", "ল্যাব সি", "ল্যাব c"].includes(normalized)) return "Lab C";
+  return "Lab A";
+}
+
+function normalizeMeritMode(value?: string): MonthlyResultEntry["meritMode"] {
+  const normalized = (value || "").trim().toLowerCase();
+  if (["lab", "lab_only", "lab only", "separate", "separate lab", "ল্যাব", "আলাদা"].includes(normalized)) {
+    return "LAB_ONLY";
+  }
+  return "COMBINED";
+}
+
 export async function GET(request: NextRequest) {
   const session = requireApiAdmin(request, [...resultRoles]);
   if (session instanceof NextResponse) return session;
@@ -161,16 +176,19 @@ export async function POST(request: NextRequest) {
     const phone = row.phone || row["ফোন"] || row.mobile || "";
     const month = row.month || row["মাস"] || "জুন ২০২৬";
     const subject = row.subject || row["বিষয়"] || "ক্লাস টেস্ট";
+    const lab = normalizeLab(row.lab || row["ল্যাব"]);
     return {
-      id: `monthly-${phone.replace(/\D/g, "")}-${slug(month)}-${slug(subject)}`,
+      id: `monthly-${phone.replace(/\D/g, "")}-${slug(month)}-${slug(subject)}-${slug(lab)}`,
       phone,
       name: row.name || row["নাম"] || "নামহীন শিক্ষার্থী",
       batch: row.batch || row["ব্যাচ"] || "৬ষ্ঠ ব্যাচ",
+      lab,
       month,
       subject,
       score: Number(row.score || row["নম্বর"] || 0),
       maxScore: Number(row.maxscore || row.maxScore || row["পূর্ণমান"] || 100),
       grade: row.grade || row["গ্রেড"] || "প্রযোজ্য নয়",
+      meritMode: normalizeMeritMode(row.meritmode || row.meritMode || row["মেধাক্রম"]),
       published: asBool(row.published, body.published ?? true),
       updatedAt: timestamp,
     };

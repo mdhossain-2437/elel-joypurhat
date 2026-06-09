@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { KeyRound, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { AdminLoginForm } from "@/components/admin-login-form";
 
 export const metadata = {
@@ -18,12 +18,10 @@ export default function AdminLoginPage() {
               নোটিশ, কোর্স, ফলাফল ও ওয়েবসাইটের কনটেন্ট নিরাপদ অ্যাডমিন সেশনের মাধ্যমে সুরক্ষিত রাখা হয়েছে।
             </p>
             <div className="demo-admin-card">
-              <KeyRound size={22} />
+              <ShieldCheck size={22} />
               <div>
-                <span>ডেমো লগইন তথ্য</span>
-                <p>ইমেইল: <strong>owner@eleljoypurhat.local</strong></p>
-                <p>পাসওয়ার্ড: <strong>Demo@12345</strong></p>
-                <p>ভূমিকা: <strong>সাইট মালিক</strong></p>
+                <span>Private access</span>
+                <p>Admin credential শুধু site owner/authorized manager-এর কাছে থাকবে। Public page-এ কোনো login info দেখানো হচ্ছে না।</p>
               </div>
             </div>
           </div>

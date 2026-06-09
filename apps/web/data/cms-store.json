@@ -13,11 +13,11 @@
   "admins": [
     {
       "id": "admin-owner",
-      "name": "সাইট মালিক",
-      "email": "owner@eleljoypurhat.local",
+      "name": "Private admin configured by environment",
+      "email": "admin@example.invalid",
       "role": "OWNER",
-      "status": "ACTIVE",
-      "passwordHash": "pbkdf2$210000$elel-joypurhat-demo-salt$tL2WO0AeSsfjob8nquIUe_NmpyIHnLuBHj50uwTRVUQ",
+      "status": "SUSPENDED",
+      "passwordHash": "",
       "createdAt": "2026-06-08T17:30:00.000Z",
       "lastLoginAt": null
     }
@@ -104,7 +104,7 @@
       "id": "admission-jyp-7001",
       "roll": "JYP-7001",
       "phone": "01332852670",
-      "name": "আয়েশা সুলতানা",
+      "name": "Ayesha Sultana",
       "written": 82,
       "viva": 18,
       "status": "Selected",
@@ -116,7 +116,7 @@
       "id": "admission-jyp-7002",
       "roll": "JYP-7002",
       "phone": "01332852671",
-      "name": "রাকিব হাসান",
+      "name": "Rakib Hasan",
       "written": 80,
       "viva": 20,
       "status": "Selected",
@@ -128,7 +128,7 @@
       "id": "admission-jyp-7003",
       "roll": "JYP-7003",
       "phone": "01700000001",
-      "name": "নুসরাত জাহান",
+      "name": "Nusrat Jahan",
       "written": 78,
       "viva": 19,
       "status": "Selected",
@@ -141,39 +141,45 @@
     {
       "id": "monthly-01332852670-may-dm",
       "phone": "01332852670",
-      "name": "আয়েশা সুলতানা",
+      "name": "Ayesha Sultana",
       "batch": "৬ষ্ঠ ব্যাচ",
+      "lab": "Lab A",
       "month": "মে ২০২৬",
-      "subject": "ডিজিটাল মার্কেটিং",
+      "subject": "Digital Marketing",
       "score": 86,
       "maxScore": 100,
       "grade": "A",
+      "meritMode": "COMBINED",
       "published": true,
       "updatedAt": "2026-06-08T17:30:00.000Z"
     },
     {
       "id": "monthly-01332852670-june-graphics",
       "phone": "01332852670",
-      "name": "আয়েশা সুলতানা",
+      "name": "Ayesha Sultana",
       "batch": "৬ষ্ঠ ব্যাচ",
+      "lab": "Lab A",
       "month": "জুন ২০২৬",
-      "subject": "গ্রাফিক ডিজাইন",
+      "subject": "Graphic Design",
       "score": 91,
       "maxScore": 100,
       "grade": "A+",
+      "meritMode": "LAB_ONLY",
       "published": true,
       "updatedAt": "2026-06-08T17:30:00.000Z"
     },
     {
       "id": "monthly-01332852671-may-free",
       "phone": "01332852671",
-      "name": "রাকিব হাসান",
+      "name": "Rakib Hasan",
       "batch": "৬ষ্ঠ ব্যাচ",
+      "lab": "Lab B",
       "month": "মে ২০২৬",
-      "subject": "ফ্রিল্যান্সিং",
+      "subject": "Freelancing",
       "score": 79,
       "maxScore": 100,
       "grade": "A-",
+      "meritMode": "COMBINED",
       "published": true,
       "updatedAt": "2026-06-08T17:30:00.000Z"
     }
@@ -181,7 +187,7 @@
   "teamMembers": [
     {
       "id": "team-md-raju-ahmed",
-      "name": "মোঃ রাজু আহমেদ",
+      "name": "Md Raju Ahmed",
       "role": "বিভাগীয় প্রধান, রাজশাহী",
       "org": "ই-লার্নিং এন্ড আর্নিং লিমিটেড",
       "category": "OFFICER",
@@ -193,7 +199,7 @@
     },
     {
       "id": "team-forhad-hasan-ripon",
-      "name": "ফরহাদ হাসান রিপন",
+      "name": "Forhad Hasan Ripon",
       "role": "কো-অর্ডিনেটর, জয়পুরহাট ব্রাঞ্চ",
       "org": "ই-লার্নিং এন্ড আর্নিং লিমিটেড",
       "category": "OFFICER",
@@ -205,7 +211,7 @@
     },
     {
       "id": "team-roton-ali",
-      "name": "রোটন আলী",
+      "name": "Roton Ali",
       "role": "সহকারী কো-অর্ডিনেটর, জয়পুরহাট ব্রাঞ্চ",
       "org": "ই-লার্নিং এন্ড আর্নিং লিমিটেড",
       "category": "OFFICER",
@@ -217,7 +223,7 @@
     },
     {
       "id": "team-debashish-karmaker",
-      "name": "দেবাশীষ কর্মকার",
+      "name": "Debashish Karmaker",
       "role": "প্রশিক্ষক (ডিজিটাল মার্কেটিং)",
       "org": "প্রশিক্ষণ টিম",
       "category": "TRAINER",
@@ -229,7 +235,7 @@
     },
     {
       "id": "team-mohaimin-islam",
-      "name": "মোহাইমিন ইসলাম",
+      "name": "Mohaimin Islam",
       "role": "প্রশিক্ষক (ডিজিটাল মার্কেটিং)",
       "org": "প্রশিক্ষণ টিম",
       "category": "TRAINER",
@@ -241,7 +247,7 @@
     },
     {
       "id": "team-antor-hossen",
-      "name": "অন্তর হোসেন",
+      "name": "Antor Hossen",
       "role": "প্রশিক্ষক (গ্রাফিক ডিজাইন)",
       "org": "প্রশিক্ষণ টিম",
       "category": "TRAINER",
@@ -253,7 +259,7 @@
     },
     {
       "id": "team-halima-akter",
-      "name": "হালিমা আক্তার",
+      "name": "Halima Akter",
       "role": "সহকারী প্রশিক্ষক (ডিজিটাল মার্কেটিং)",
       "org": "প্রশিক্ষণ টিম",
       "category": "TRAINER",
@@ -265,7 +271,7 @@
     },
     {
       "id": "team-razia-akter",
-      "name": "রাজিয়া আক্তার",
+      "name": "Razia Akter",
       "role": "সহকারী প্রশিক্ষক (গ্রাফিক ডিজাইন)",
       "org": "প্রশিক্ষণ টিম",
       "category": "TRAINER",
@@ -311,7 +317,7 @@
   "auditLogs": [
     {
       "id": "audit-media-logo",
-      "actor": "owner@eleljoypurhat.local",
+      "actor": "admin@eleljoypurhat.local",
       "action": "UPDATE_MEDIA_ASSET",
       "target": "media-elel-logo",
       "createdAt": "2026-06-09T04:45:34.385Z",
@@ -319,7 +325,7 @@
     },
     {
       "id": "audit-site-settings",
-      "actor": "owner@eleljoypurhat.local",
+      "actor": "admin@eleljoypurhat.local",
       "action": "UPDATE_SITE_SETTINGS",
       "target": "settings",
       "createdAt": "2026-06-09T04:45:33.269Z",

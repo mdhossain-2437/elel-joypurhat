@@ -27,9 +27,25 @@ Recommended environment variables:
 
 ```txt
 DATABASE_URL=postgresql://...
+ADMIN_EMAIL=admin@example.com
+ADMIN_NAME=ELeL Joypurhat Admin
+ADMIN_PASSWORD_HASH=pbkdf2$iterations$salt$hash
 ADMIN_SESSION_SECRET=long-random-secret
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
+SMS_API_KEY=
+SMS_SENDER_ID=
+EMAIL_API_KEY=
 ```
+
+Credentials needed for final setup:
+- GitHub repository access for deployment updates.
+- Vercel account or team access for hosting.
+- Domain DNS access for custom domain and SSL.
+- Neon PostgreSQL connection string for the live database.
+- SMS provider API key and sender ID if SMS result/notice alerts are enabled.
+- Email provider key if password reset or notice email is enabled.
+- A strong admin session secret generated for production only.
+- Private admin email and password hash. These must be set in Vercel/hosting env, not committed to GitHub.
 
 ## Admin CMS
 
@@ -38,20 +54,15 @@ Built-in admin features:
 - Role-aware admin/API protection.
 - Notice, course, team, media and result management.
 - Admission result and monthly result publishing.
+- Monthly result Lab A, Lab B, Lab C support.
+- Monthly result all-lab merit and lab-wise merit mode.
 - CSV/TSV result import.
 - Data tables with search, status filter, column sort and row actions.
 - Imported result rows can be edited from the result database table.
 - Publish, hide/archive and delete controls.
 - Audit log for content changes.
 
-Demo admin:
-
-```txt
-Email: owner@eleljoypurhat.local
-Password: Demo@12345
-```
-
-Change this before production handoff.
+Admin credentials are intentionally not published in this repository. The seed data contains only a locked placeholder admin; the real admin account is loaded from private environment variables. Share the login only with the project owner or authorized manager, then change it before final handoff.
 
 ## SEO Checklist
 
@@ -86,4 +97,3 @@ Before live launch:
    - Admin login
    - Notice/course/result publish
    - Sitemap and robots
-

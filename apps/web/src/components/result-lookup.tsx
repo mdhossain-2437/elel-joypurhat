@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { BadgeCheck, BookOpenCheck, Search, Trophy } from "lucide-react";
-import type { MonthlyResultEntry, PublicAdmissionResult } from "@/lib/cms-types";
+import type { PublicAdmissionResult, PublicMonthlyResult } from "@/lib/cms-types";
 
 type Mode = "admission" | "monthly";
 
@@ -27,7 +27,7 @@ export function ResultLookup({ mode }: { mode: Mode }) {
   const [phone, setPhone] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [admission, setAdmission] = useState<PublicAdmissionResult | null>(null);
-  const [monthly, setMonthly] = useState<MonthlyResultEntry[]>([]);
+  const [monthly, setMonthly] = useState<PublicMonthlyResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [lookupError, setLookupError] = useState("");
 
@@ -48,7 +48,7 @@ export function ResultLookup({ mode }: { mode: Mode }) {
     });
 
     const payload = (await response.json().catch(() => null)) as
-      | { result?: PublicAdmissionResult | null; results?: MonthlyResultEntry[]; error?: string }
+      | { result?: PublicAdmissionResult | null; results?: PublicMonthlyResult[]; error?: string }
       | null;
 
     setLoading(false);
@@ -172,11 +172,11 @@ export function ResultLookup({ mode }: { mode: Mode }) {
               {submitted && !isAdmission ? (
                 monthly.length ? (
                   <div className="grid gap-3">
-                    {monthly.map((item: MonthlyResultEntry) => (
-                      <div key={`${item.phone}-${item.month}-${item.subject}`} className="result-card">
+                    {monthly.map((item) => (
+                      <div key={`${item.phone}-${item.lab}-${item.month}-${item.subject}`} className="result-card">
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <p className="text-sm font-bold text-zinc-500">{item.batch} / {item.month}</p>
+                            <p className="text-sm font-bold text-zinc-500">{item.batch} / {item.lab} / {item.month}</p>
                             <h2 className="mt-1 text-xl font-black text-zinc-950">{item.subject}</h2>
                             <p className="mt-1 text-sm text-zinc-600">{item.name}</p>
                           </div>
@@ -193,6 +193,14 @@ export function ResultLookup({ mode }: { mode: Mode }) {
                         </div>
                         <p className="mt-3 text-sm text-zinc-600">
                           নম্বর: {item.score}/{item.maxScore}
+                        </p>
+                        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                          <Metric label="Merit" value={item.displayedMerit} />
+                          <Metric label="Overall" value={item.overallMerit} />
+                          <Metric label={item.lab} value={item.labMerit} />
+                        </div>
+                        <p className="mt-3 text-xs font-bold text-zinc-500">
+                          {item.meritMode === "LAB_ONLY" ? "এই ফলাফলে lab-wise merit দেখানো হচ্ছে।" : "এই ফলাফলে সব lab মিলিয়ে merit দেখানো হচ্ছে।"}
                         </p>
                       </div>
                     ))}

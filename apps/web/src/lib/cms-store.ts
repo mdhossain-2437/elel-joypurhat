@@ -10,6 +10,7 @@ import type {
   MonthlyResultEntry,
   NoticeEntry,
   PublicAdmissionResult,
+  PublicMonthlyResult,
   SiteSettings,
   TeamMemberEntry,
 } from "@/lib/cms-types";
@@ -80,6 +81,11 @@ export function sanitizeCmsStore(store: CmsStore) {
 function normalizeStore(store: CmsStore): CmsStore {
   return {
     ...store,
+    monthlyResults: (store.monthlyResults || []).map((row) => ({
+      ...row,
+      lab: row.lab || "Lab A",
+      meritMode: row.meritMode || "COMBINED",
+    })),
     teamMembers: store.teamMembers || [],
     mediaAssets: store.mediaAssets || [],
     auditLogs: store.auditLogs || [],
@@ -304,9 +310,55 @@ export async function findMonthlyResults(phone: string) {
   const store = await readCmsStore();
   const normalizedPhone = normalizePhone(phone);
 
-  return store.monthlyResults
-    .filter((row) => row.published && normalizePhone(row.phone) === normalizedPhone)
+  return withMonthlyMerit(store.monthlyResults)
+    .filter((row) => normalizePhone(row.phone) === normalizedPhone)
     .toSorted((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
+function meritMap(rows: MonthlyResultEntry[], scope: (row: MonthlyResultEntry) => string) {
+  const grouped = new Map<string, MonthlyResultEntry[]>();
+  for (const row of rows.filter((item) => item.published)) {
+    const key = scope(row);
+    grouped.set(key, [...(grouped.get(key) || []), row]);
+  }
+
+  const merits = new Map<string, number>();
+  for (const groupRows of grouped.values()) {
+    let previousScore: number | null = null;
+    let previousMerit = 0;
+    groupRows
+      .toSorted((a, b) => b.score - a.score)
+      .forEach((row, index) => {
+        const merit = previousScore === row.score ? previousMerit : index + 1;
+        previousScore = row.score;
+        previousMerit = merit;
+        merits.set(row.id, merit);
+      });
+  }
+  return merits;
+}
+
+export function withMonthlyMerit(rows: MonthlyResultEntry[]): PublicMonthlyResult[] {
+  const published = rows.filter((row) => row.published);
+  const examScope = (row: MonthlyResultEntry) => `${row.batch}|${row.month}|${row.subject}`;
+  const labScope = (row: MonthlyResultEntry) => `${examScope(row)}|${row.lab}`;
+  const overallMerits = meritMap(published, examScope);
+  const labMerits = meritMap(published, labScope);
+
+  return published.map((row) => {
+    const percentage = row.maxScore ? Math.round((row.score / row.maxScore) * 100) : 0;
+    const overallMerit = overallMerits.get(row.id) || 0;
+    const labMerit = labMerits.get(row.id) || 0;
+    const displayedMerit = row.meritMode === "LAB_ONLY" ? labMerit : overallMerit;
+    return {
+      ...row,
+      percentage,
+      overallMerit,
+      labMerit,
+      displayedMerit,
+      meritLabel: row.meritMode === "LAB_ONLY" ? `${row.lab} merit` : "Overall merit",
+    };
+  });
 }
 
 export async function upsertNotice(input: Partial<NoticeEntry>, actor: string) {
@@ -530,11 +582,13 @@ export async function upsertMonthlyResult(input: Partial<MonthlyResultEntry>, ac
     phone: input.phone?.trim() || "",
     name: input.name?.trim() || "নামহীন শিক্ষার্থী",
     batch: input.batch?.trim() || "৬ষ্ঠ ব্যাচ",
+    lab: input.lab || "Lab A",
     month: input.month?.trim() || "জুন ২০২৬",
     subject: input.subject?.trim() || "ক্লাস টেস্ট",
     score: Number(input.score || 0),
     maxScore: Number(input.maxScore || 100),
     grade: input.grade?.trim() || "প্রযোজ্য নয়",
+    meritMode: input.meritMode || "COMBINED",
     published: Boolean(input.published),
     updatedAt: timestamp,
   };

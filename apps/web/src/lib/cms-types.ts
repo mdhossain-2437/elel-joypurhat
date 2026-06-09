@@ -1,6 +1,8 @@
 export type AdminRole = "OWNER" | "SUPER_ADMIN" | "ADMIN" | "RESULT_MANAGER" | "EDITOR" | "VIEWER";
 export type PublishStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
 export type AdmissionStatus = "Selected" | "Waiting" | "Not Selected";
+export type TrainingLab = "Lab A" | "Lab B" | "Lab C";
+export type MonthlyMeritMode = "COMBINED" | "LAB_ONLY";
 
 export type SiteSettings = {
   siteName: string;
@@ -64,11 +66,13 @@ export type MonthlyResultEntry = {
   phone: string;
   name: string;
   batch: string;
+  lab: TrainingLab;
   month: string;
   subject: string;
   score: number;
   maxScore: number;
   grade: string;
+  meritMode: MonthlyMeritMode;
   published: boolean;
   updatedAt: string;
 };
@@ -123,4 +127,12 @@ export type CmsStore = {
 export type PublicAdmissionResult = AdmissionResultEntry & {
   total: number;
   merit: number;
+};
+
+export type PublicMonthlyResult = MonthlyResultEntry & {
+  percentage: number;
+  overallMerit: number;
+  labMerit: number;
+  displayedMerit: number;
+  meritLabel: string;
 };

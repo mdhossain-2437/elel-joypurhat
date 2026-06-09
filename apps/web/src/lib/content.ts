@@ -129,19 +129,19 @@ export const crmFeatures: Array<{
 export const team = {
   officers: [
     {
-      name: "মোঃ রাজু আহমেদ",
+      name: "Md Raju Ahmed",
       role: "বিভাগীয় প্রধান, রাজশাহী",
       org: "ই-লার্নিং এন্ড আর্নিং লিমিটেড",
       image: "/media/team/md-raju-ahmed.png",
     },
     {
-      name: "ফরহাদ হাসান রিপন",
+      name: "Forhad Hasan Ripon",
       role: "কো-অর্ডিনেটর, জয়পুরহাট ব্রাঞ্চ",
       org: "ই-লার্নিং এন্ড আর্নিং লিমিটেড",
       image: "/media/team/forhad-hasan-ripon.png",
     },
     {
-      name: "রোটন আলী",
+      name: "Roton Ali",
       role: "সহকারী কো-অর্ডিনেটর, জয়পুরহাট ব্রাঞ্চ",
       org: "ই-লার্নিং এন্ড আর্নিং লিমিটেড",
       image: "/media/team/roton-ali.png",
@@ -149,27 +149,27 @@ export const team = {
   ],
   trainers: [
     {
-      name: "দেবাশীষ কর্মকার",
+      name: "Debashish Karmaker",
       role: "প্রশিক্ষক (ডিজিটাল মার্কেটিং)",
       image: "/media/team/debashish-karmaker.webp",
     },
     {
-      name: "মোহাইমিন ইসলাম",
+      name: "Mohaimin Islam",
       role: "প্রশিক্ষক (ডিজিটাল মার্কেটিং)",
       image: "/media/team/mohaimin-islam.webp",
     },
     {
-      name: "অন্তর হোসেন",
+      name: "Antor Hossen",
       role: "প্রশিক্ষক (গ্রাফিক ডিজাইন)",
       image: "/media/team/antor-hossen.webp",
     },
     {
-      name: "হালিমা আক্তার",
+      name: "Halima Akter",
       role: "সহকারী প্রশিক্ষক (ডিজিটাল মার্কেটিং)",
       image: "/media/team/halima-akter.jpg",
     },
     {
-      name: "রাজিয়া আক্তার",
+      name: "Razia Akter",
       role: "সহকারী প্রশিক্ষক (গ্রাফিক ডিজাইন)",
       image: "/media/team/razia-akter.jpg",
     },

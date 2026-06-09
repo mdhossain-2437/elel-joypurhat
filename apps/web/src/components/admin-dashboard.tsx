@@ -70,9 +70,11 @@ const publishOptions: PublishStatus[] = ["DRAFT", "PUBLISHED", "ARCHIVED"];
 const mediaKindOptions: MediaAssetEntry["kind"][] = ["IMAGE", "DOCUMENT", "DOWNLOAD", "VIDEO"];
 const teamCategoryOptions: TeamMemberEntry["category"][] = ["OFFICER", "TRAINER"];
 const admissionStatusOptions: AdmissionResultEntry["status"][] = ["Selected", "Waiting", "Not Selected"];
+const labOptions: MonthlyResultEntry["lab"][] = ["Lab A", "Lab B", "Lab C"];
+const meritModeOptions: MonthlyResultEntry["meritMode"][] = ["COMBINED", "LAB_ONLY"];
 const resultImportSample = {
   admission: "roll,phone,name,written,viva,status,batch,published\nJYP-7020,01700000020,নতুন প্রার্থী,78,17,Selected,৭ম ব্যাচ,true",
-  monthly: "phone,name,batch,month,subject,score,maxScore,grade,published\n01700000020,নতুন শিক্ষার্থী,৬ষ্ঠ ব্যাচ,জুন ২০২৬,ডিজিটাল মার্কেটিং,84,100,A,true",
+  monthly: "phone,name,batch,lab,month,subject,score,maxScore,grade,meritMode,published\n01700000020,New Student,৬ষ্ঠ ব্যাচ,Lab B,জুন ২০২৬,Digital Marketing,84,100,A,COMBINED,true",
 };
 
 const optionLabels: Record<string, string> = {
@@ -85,6 +87,11 @@ const optionLabels: Record<string, string> = {
   VIDEO: "ভিডিও",
   admission: "ভর্তি ফলাফল",
   monthly: "মাসিক ফলাফল",
+  "Lab A": "Lab A",
+  "Lab B": "Lab B",
+  "Lab C": "Lab C",
+  COMBINED: "All labs merit",
+  LAB_ONLY: "Lab-wise merit",
   OFFICER: "কর্মকর্তা",
   TRAINER: "প্রশিক্ষক",
   Selected: "নির্বাচিত",
@@ -182,11 +189,13 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
     phone: "01700000010",
     name: "ডেমো শিক্ষার্থী",
     batch: "৬ষ্ঠ ব্যাচ",
+    lab: "Lab A",
     month: "জুন ২০২৬",
     subject: "ডিজিটাল মার্কেটিং",
     score: 82,
     maxScore: 100,
     grade: "A",
+    meritMode: "COMBINED",
     published: true,
   });
   const [teamMember, setTeamMember] = useState<Partial<TeamMemberEntry>>({
@@ -290,7 +299,7 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
       <section className="admin-console-hero">
         <div className="admin-hero-main">
           <div className="admin-brand-chip">
-            <NextImage src="/media/elogo.png" alt="ই-লার্নিং এন্ড আর্নিং লিমিটেডের লোগো" width={180} height={64} priority />
+            <NextImage src="/media/elogo.png" alt="ই-লার্নিং এন্ড আর্নিং লিমিটেডের লোগো" width={180} height={64} style={{ width: "180px", height: "auto" }} priority />
             <span>জয়পুরহাট কনটেন্ট প্যানেল</span>
           </div>
           <p className="kicker-light">ব্রাঞ্চ কন্ট্রোল প্যানেল</p>
@@ -362,7 +371,7 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
             </div>
             <div className="admin-command-layout">
               <div className="admin-branch-card">
-                <NextImage src="/media/elogo.png" alt="ই-লার্নিং এন্ড আর্নিং লিমিটেডের লোগো" width={210} height={80} />
+                <NextImage src="/media/elogo.png" alt="ই-লার্নিং এন্ড আর্নিং লিমিটেডের লোগো" width={210} height={80} style={{ width: "210px", height: "auto" }} />
                 <h3>{store.settings.siteName}</h3>
                 <p>{branch.address}</p>
                 <div>
@@ -424,7 +433,7 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
 
           <Panel title="লাইভ ব্রাঞ্চ প্রিভিউ" icon={Globe2}>
             <div className="admin-preview-card">
-              <NextImage src="/media/elogo.png" alt="ই-লার্নিং এন্ড আর্নিং লিমিটেডের লোগো" width={190} height={70} />
+              <NextImage src="/media/elogo.png" alt="ই-লার্নিং এন্ড আর্নিং লিমিটেডের লোগো" width={190} height={70} style={{ width: "190px", height: "auto" }} />
               <span>{settings.admissionStatus}</span>
               <h3>{settings.siteName}</h3>
               <p>{settings.tagline}</p>
@@ -583,11 +592,13 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
             <AdminInput label="ফোন" value={monthlyResult.phone} onChange={(value) => setMonthlyResult({ ...monthlyResult, phone: value })} />
             <AdminInput label="নাম" value={monthlyResult.name} onChange={(value) => setMonthlyResult({ ...monthlyResult, name: value })} />
             <AdminInput label="ব্যাচ" value={monthlyResult.batch} onChange={(value) => setMonthlyResult({ ...monthlyResult, batch: value })} />
+            <AdminSelect label="Lab" value={monthlyResult.lab || "Lab A"} options={labOptions} onChange={(value) => setMonthlyResult({ ...monthlyResult, lab: value as MonthlyResultEntry["lab"] })} />
             <AdminInput label="মাস" value={monthlyResult.month} onChange={(value) => setMonthlyResult({ ...monthlyResult, month: value })} />
             <AdminInput label="বিষয়" value={monthlyResult.subject} onChange={(value) => setMonthlyResult({ ...monthlyResult, subject: value })} />
             <AdminInput label="নম্বর" value={String(monthlyResult.score ?? "")} onChange={(value) => setMonthlyResult({ ...monthlyResult, score: Number(value) })} />
             <AdminInput label="পূর্ণমান" value={String(monthlyResult.maxScore ?? "")} onChange={(value) => setMonthlyResult({ ...monthlyResult, maxScore: Number(value) })} />
             <AdminInput label="গ্রেড" value={monthlyResult.grade} onChange={(value) => setMonthlyResult({ ...monthlyResult, grade: value })} />
+            <AdminSelect label="Merit type" value={monthlyResult.meritMode || "COMBINED"} options={meritModeOptions} onChange={(value) => setMonthlyResult({ ...monthlyResult, meritMode: value as MonthlyResultEntry["meritMode"] })} />
             <label className="admin-check">
               <input
                 checked={Boolean(monthlyResult.published)}
@@ -650,11 +661,14 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
               statusOptions={[
                 { value: "PUBLISHED", label: "প্রকাশিত" },
                 { value: "HIDDEN", label: "লুকানো" },
+                ...labOptions.map((value) => ({ value, label: value })),
+                ...meritModeOptions.map((value) => ({ value, label: displayAdminValue(value) })),
               ]}
               initialSortKey="score"
               columns={[
                 { key: "name", label: "শিক্ষার্থী", sortable: true },
                 { key: "phone", label: "ফোন", sortable: true },
+                { key: "lab", label: "Lab", sortable: true },
                 { key: "subject", label: "বিষয়", sortable: true },
                 { key: "score", label: "নম্বর", sortable: true, align: "right" },
                 { key: "grade", label: "গ্রেড", sortable: true },
@@ -663,12 +677,13 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
                 id: item.id,
                 statusValue: item.published ? "PUBLISHED" : "HIDDEN",
                 statusLabel: item.published ? "প্রকাশিত" : "লুকানো",
-                filterValues: [item.published ? "PUBLISHED" : "HIDDEN", item.grade],
-                searchText: [item.phone, item.name, item.batch, item.month, item.subject, item.grade, item.published].join(" "),
-                sortValues: { name: item.name, phone: item.phone, subject: item.subject, score: item.score, grade: item.grade },
+                filterValues: [item.published ? "PUBLISHED" : "HIDDEN", item.grade, item.lab, item.meritMode],
+                searchText: [item.phone, item.name, item.batch, item.lab, item.month, item.subject, item.grade, item.meritMode, item.published].join(" "),
+                sortValues: { name: item.name, phone: item.phone, lab: item.lab, subject: item.subject, score: item.score, grade: item.grade },
                 cells: {
                   name: <strong>{item.name}</strong>,
                   phone: item.phone,
+                  lab: item.lab,
                   subject: `${item.subject} / ${item.month}`,
                   score: `${item.score}/${item.maxScore}`,
                   grade: item.published ? item.grade : "লুকানো",

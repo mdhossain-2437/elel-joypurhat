@@ -9,6 +9,8 @@ import { readCmsStore, writeCmsStore } from "@/lib/cms-store";
 export const ADMIN_COOKIE = "elel_admin_session";
 const sessionTtlSeconds = 60 * 60 * 8;
 const secret = process.env.ADMIN_SESSION_SECRET || "elel-joypurhat-local-dev-secret-change-me";
+const bootstrapAdminEmail = process.env.ADMIN_EMAIL?.trim();
+const bootstrapAdminPasswordHash = process.env.ADMIN_PASSWORD_HASH?.trim();
 
 export type AdminSession = {
   sub: string;
@@ -24,6 +26,21 @@ function base64url(input: string | Buffer) {
 
 function sign(value: string) {
   return crypto.createHmac("sha256", secret).update(value).digest("base64url");
+}
+
+function bootstrapAdmin(): AdminUser | null {
+  if (!bootstrapAdminEmail || !bootstrapAdminPasswordHash) return null;
+
+  return {
+    id: "env-owner",
+    name: process.env.ADMIN_NAME?.trim() || "ELeL Joypurhat Admin",
+    email: bootstrapAdminEmail,
+    role: "OWNER",
+    status: "ACTIVE",
+    passwordHash: bootstrapAdminPasswordHash,
+    createdAt: "2026-06-09T00:00:00.000Z",
+    lastLoginAt: null,
+  };
 }
 
 export function verifyPassword(password: string, storedHash: string) {
@@ -66,18 +83,27 @@ export function readSessionToken(token?: string | null): AdminSession | null {
 
 export async function authenticateAdmin(email: string, password: string) {
   const store = await readCmsStore();
-  const admin = store.admins.find((user) => user.email.toLowerCase() === email.trim().toLowerCase());
+  const requestedEmail = email.trim().toLowerCase();
+  const envAdmin = bootstrapAdmin();
+  const admin =
+    envAdmin && envAdmin.email.toLowerCase() === requestedEmail
+      ? envAdmin
+      : store.admins.find((user) => user.email.toLowerCase() === requestedEmail);
+
   if (!admin || admin.status !== "ACTIVE" || !verifyPassword(password, admin.passwordHash)) {
     return null;
   }
 
-  admin.lastLoginAt = new Date().toISOString();
+  const loginAt = new Date().toISOString();
+  if (admin.id !== "env-owner") {
+    admin.lastLoginAt = loginAt;
+  }
   store.auditLogs.unshift({
     id: `audit-${Date.now().toString(36)}`,
     actor: admin.email,
     action: "ADMIN_LOGIN",
     target: admin.id,
-    createdAt: admin.lastLoginAt,
+    createdAt: loginAt,
     meta: "সফল লগইন",
   });
   await writeCmsStore(store);
