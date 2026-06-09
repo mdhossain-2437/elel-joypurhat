@@ -8,7 +8,18 @@
     "activeBatch": "৭ম ব্যাচ",
     "seoTitle": "ই-লার্নিং এন্ড আর্নিং লিমিটেড — জয়পুরহাট ব্রাঞ্চ",
     "seoDescription": "ই-লার্নিং এন্ড আর্নিং জয়পুরহাট ব্রাঞ্চের সরকারি ফ্রিল্যান্সিং প্রশিক্ষণ, কোর্স, ভর্তি নোটিশ, ব্যক্তিগত ফলাফল ও শিক্ষার্থী সহায়তার নির্ভরযোগ্য ওয়েবসাইট।",
-    "maintenanceMode": false
+    "maintenanceMode": false,
+    "admissionPopup": {
+      "enabled": true,
+      "title": "৭ম ব্যাচে ভর্তি চলছে",
+      "detail": "যুব উন্নয়ন ফ্রিল্যান্সিং প্রশিক্ষণের ৭ম ব্যাচে আবেদন চলছে। সঠিক তথ্য দিয়ে আবেদন করুন, অ্যাডমিট কার্ড সংরক্ষণ করুন এবং পরীক্ষার তারিখ মনে রাখুন।",
+      "image": "/media/jubo-64-banner.jpeg",
+      "imageGuidance": "Recommended image size: 1200x900px বা 4:3 ratio, JPG/PNG/WebP, 500KB-এর নিচে হলে দ্রুত load হবে।",
+      "startsAt": "2026-06-01",
+      "deadline": "2026-06-15",
+      "applyHref": "https://e-laeltd.com/64-student-reg-jubo",
+      "primaryLabel": "Apply now"
+    }
   },
   "admins": [
     {

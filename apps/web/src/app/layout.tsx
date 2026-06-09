@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans_Bengali } from "next/font/google";
+import { AdmissionPopup } from "@/components/admission-popup";
 import { StructuredData } from "@/components/structured-data";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -99,11 +100,15 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const popup = await readCmsStore()
+    .then((store) => store.settings.admissionPopup)
+    .catch(() => null);
+
   return (
     <html
       lang="bn"
@@ -113,6 +118,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <StructuredData />
         <SiteHeader />
+        <AdmissionPopup popup={popup} />
         <div className="flex-1">{children}</div>
         <SiteFooter />
       </body>

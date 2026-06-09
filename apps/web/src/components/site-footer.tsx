@@ -9,7 +9,7 @@ const quickLinks = [
   ["প্রকল্প", "/projects"],
   ["শিক্ষার্থীর গল্প", "/success-stories"],
   ["নোটিশ", "/notices"],
-  ["ভর্তি ফলাফল", "/results/admission"],
+  ["ফলাফল", "/results"],
   ["মাসিক ফলাফল", "/results/monthly"],
 ];
 
@@ -65,7 +65,12 @@ export function SiteFooter() {
 
       <div className="site-container footer-bottom">
         <span>© ই-লার্নিং এন্ড আর্নিং, জয়পুরহাট ব্রাঞ্চ। সর্বস্বত্ব সংরক্ষিত।</span>
-        <span>ডিজাইন ও ডেভেলপমেন্ট: দেলোয়ার হোসাইন</span>
+        <span>
+          Design & Development:{" "}
+          <Link href="https://delowarhossain.dev/" target="_blank" rel="noopener noreferrer">
+            Delowar Hossain
+          </Link>
+        </span>
       </div>
     </footer>
   );

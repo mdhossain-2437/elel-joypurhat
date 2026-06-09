@@ -12,6 +12,19 @@ export type SiteSettings = {
   seoTitle: string;
   seoDescription: string;
   maintenanceMode: boolean;
+  admissionPopup: AdmissionPopupSettings;
+};
+
+export type AdmissionPopupSettings = {
+  enabled: boolean;
+  title: string;
+  detail: string;
+  image: string;
+  imageGuidance: string;
+  startsAt: string;
+  deadline: string;
+  applyHref: string;
+  primaryLabel: string;
 };
 
 export type AdminUser = {

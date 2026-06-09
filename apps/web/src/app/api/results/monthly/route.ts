@@ -3,14 +3,17 @@ import { findMonthlyResults } from "@/lib/cms-store";
 import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
-  const limited = rateLimit(request, "monthly-result", { limit: 30, windowMs: 60_000 });
+  const limited = rateLimit(request, "monthly-result", { limit: 18, windowMs: 60_000, blockMs: 3 * 60_000 });
   if (limited) return limited;
 
-  const body = (await request.json().catch(() => null)) as { phone?: string } | null;
+  const body = (await request.json().catch(() => null)) as { phone?: string; batch?: string; lab?: string } | null;
   if (!body?.phone) {
     return NextResponse.json({ error: "ফোন নম্বর দিতে হবে।" }, { status: 400 });
   }
 
-  const results = await findMonthlyResults(body.phone);
+  const results = await findMonthlyResults(body.phone, {
+    batch: body.batch,
+    lab: body.lab,
+  });
   return NextResponse.json({ results });
 }

@@ -3,6 +3,7 @@ import "server-only";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type {
+  AdmissionPopupSettings,
   AdmissionResultEntry,
   CmsStore,
   CourseEntry,
@@ -17,6 +18,18 @@ import type {
 } from "@/lib/cms-types";
 
 const storePath = path.join(process.cwd(), "data", "cms-store.json");
+
+const defaultAdmissionPopup: AdmissionPopupSettings = {
+  enabled: true,
+  title: "৭ম ব্যাচে ভর্তি চলছে",
+  detail: "যুব উন্নয়ন ফ্রিল্যান্সিং প্রশিক্ষণের ৭ম ব্যাচে আবেদন চলছে। সঠিক তথ্য দিয়ে আবেদন করুন, অ্যাডমিট কার্ড সংরক্ষণ করুন এবং পরীক্ষার তারিখ মনে রাখুন।",
+  image: "/media/jubo-64-banner.jpeg",
+  imageGuidance: "Recommended image size: 1200x900px বা 4:3 ratio, JPG/PNG/WebP, 500KB-এর নিচে হলে দ্রুত load হবে।",
+  startsAt: "2026-06-01",
+  deadline: "2026-06-15",
+  applyHref: "https://e-laeltd.com/64-student-reg-jubo",
+  primaryLabel: "Apply now",
+};
 export type CmsActionCollection =
   | "notices"
   | "courses"
@@ -84,6 +97,13 @@ export function sanitizeCmsStore(store: CmsStore) {
 function normalizeStore(store: CmsStore): CmsStore {
   return {
     ...store,
+    settings: {
+      ...store.settings,
+      admissionPopup: {
+        ...defaultAdmissionPopup,
+        ...(store.settings?.admissionPopup || {}),
+      },
+    },
     admins: (store.admins || []).map((admin) => ({
       ...admin,
       passwordChangedAt: admin.passwordChangedAt || null,
@@ -319,21 +339,28 @@ export function withMerit(rows: AdmissionResultEntry[]): PublicAdmissionResult[]
     });
 }
 
-export async function findAdmissionResult(roll: string, phone: string) {
+export async function findAdmissionResult(roll: string, phone: string, batch?: string) {
   const store = await readCmsStore();
   const normalizedPhone = normalizePhone(phone);
 
   return withMerit(store.admissionResults).find(
-    (row) => row.roll.toLowerCase() === roll.trim().toLowerCase() && normalizePhone(row.phone) === normalizedPhone,
+    (row) =>
+      row.roll.toLowerCase() === roll.trim().toLowerCase() &&
+      normalizePhone(row.phone) === normalizedPhone &&
+      (!batch || row.batch === batch),
   );
 }
 
-export async function findMonthlyResults(phone: string) {
+export async function findMonthlyResults(phone: string, filters: { batch?: string; lab?: string } = {}) {
   const store = await readCmsStore();
   const normalizedPhone = normalizePhone(phone);
 
   return withMonthlyMerit(store.monthlyResults)
-    .filter((row) => normalizePhone(row.phone) === normalizedPhone)
+    .filter((row) =>
+      normalizePhone(row.phone) === normalizedPhone &&
+      (!filters.batch || row.batch === filters.batch) &&
+      (!filters.lab || row.lab === filters.lab)
+    )
     .toSorted((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
@@ -465,6 +492,20 @@ export async function updateSettings(input: Partial<SiteSettings>, actor: string
     seoTitle: input.seoTitle?.trim() || store.settings.seoTitle,
     seoDescription: input.seoDescription?.trim() || store.settings.seoDescription,
     maintenanceMode: input.maintenanceMode ?? store.settings.maintenanceMode,
+    admissionPopup: {
+      ...defaultAdmissionPopup,
+      ...store.settings.admissionPopup,
+      ...(input.admissionPopup || {}),
+      enabled: input.admissionPopup?.enabled ?? store.settings.admissionPopup.enabled,
+      title: input.admissionPopup?.title?.trim() || store.settings.admissionPopup.title,
+      detail: input.admissionPopup?.detail?.trim() || store.settings.admissionPopup.detail,
+      image: input.admissionPopup?.image?.trim() || store.settings.admissionPopup.image,
+      imageGuidance: input.admissionPopup?.imageGuidance?.trim() || store.settings.admissionPopup.imageGuidance,
+      startsAt: input.admissionPopup?.startsAt?.trim() || store.settings.admissionPopup.startsAt,
+      deadline: input.admissionPopup?.deadline?.trim() || store.settings.admissionPopup.deadline,
+      applyHref: input.admissionPopup?.applyHref?.trim() || store.settings.admissionPopup.applyHref,
+      primaryLabel: input.admissionPopup?.primaryLabel?.trim() || store.settings.admissionPopup.primaryLabel,
+    },
   };
 
   store.settings = nextSettings;

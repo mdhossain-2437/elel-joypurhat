@@ -3,7 +3,7 @@ import { ADMIN_COOKIE, authenticateAdmin, createSessionToken } from "@/lib/auth"
 import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
-  const limited = rateLimit(request, "admin-login", { limit: 10, windowMs: 60_000 });
+  const limited = rateLimit(request, "admin-login", { limit: 8, windowMs: 60_000, blockMs: 3 * 60_000 });
   if (limited) return limited;
 
   const body = (await request.json().catch(() => null)) as { email?: string; password?: string } | null;

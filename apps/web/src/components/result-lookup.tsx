@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BadgeCheck, BookOpenCheck, Search, Trophy } from "lucide-react";
+import { BadgeCheck, BookOpenCheck, Layers3, Search, Trophy } from "lucide-react";
 import type { PublicAdmissionResult, PublicMonthlyResult } from "@/lib/cms-types";
 
 type Mode = "admission" | "monthly";
@@ -16,6 +16,15 @@ const demoData = {
   },
 };
 
+const admissionBatchOptions = ["৭ম ব্যাচ", "৬ষ্ঠ ব্যাচ"];
+const monthlyBatchOptions = ["৬ষ্ঠ ব্যাচ", "৭ম ব্যাচ"];
+const labOptions = [
+  ["", "সব ল্যাব"],
+  ["Lab A", "Lab A"],
+  ["Lab B", "Lab B"],
+  ["Lab C", "Lab C"],
+];
+
 const admissionStatusBn = {
   Selected: "নির্বাচিত",
   Waiting: "অপেক্ষমান",
@@ -25,6 +34,8 @@ const admissionStatusBn = {
 export function ResultLookup({ mode }: { mode: Mode }) {
   const [roll, setRoll] = useState("");
   const [phone, setPhone] = useState("");
+  const [batch, setBatch] = useState(mode === "admission" ? "৭ম ব্যাচ" : "৬ষ্ঠ ব্যাচ");
+  const [lab, setLab] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [admission, setAdmission] = useState<PublicAdmissionResult | null>(null);
   const [monthly, setMonthly] = useState<PublicMonthlyResult[]>([]);
@@ -44,7 +55,7 @@ export function ResultLookup({ mode }: { mode: Mode }) {
     const response = await fetch(isAdmission ? "/api/results/admission" : "/api/results/monthly", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(isAdmission ? { roll, phone } : { phone }),
+      body: JSON.stringify(isAdmission ? { roll, phone, batch } : { phone, batch, lab: lab || undefined }),
     });
 
     const payload = (await response.json().catch(() => null)) as
@@ -77,7 +88,7 @@ export function ResultLookup({ mode }: { mode: Mode }) {
             <p className="mt-5 max-w-2xl text-base leading-8 text-zinc-700">
               {isAdmission
                 ? "অ্যাডমিট কার্ডের রোল নম্বর ও রেজিস্টার্ড ফোন নম্বর দিলে শুধু নিজের ফলাফল দেখা যাবে। এখানে কোনো পাবলিক মেরিট তালিকা প্রকাশ করা হয় না।"
-                : "ক্লাস টেস্ট বা মাসিক পরীক্ষার ফলাফল দেখতে রেজিস্টার্ড ফোন নম্বর ব্যবহার করুন।"}
+                : "ক্লাস টেস্ট বা মাসিক পরীক্ষার ফলাফল দেখতে ব্যাচ, ল্যাব ও রেজিস্টার্ড ফোন নম্বর ব্যবহার করুন।"}
             </p>
 
             <div className="demo-result-card">
@@ -96,8 +107,11 @@ export function ResultLookup({ mode }: { mode: Mode }) {
                   if (isAdmission) {
                     setRoll(demoData.admission.roll);
                     setPhone(demoData.admission.phone);
+                    setBatch("৭ম ব্যাচ");
                   } else {
                     setPhone(demoData.monthly.phone);
+                    setBatch("৬ষ্ঠ ব্যাচ");
+                    setLab("");
                   }
                   setSubmitted(false);
                 }}
@@ -125,6 +139,28 @@ export function ResultLookup({ mode }: { mode: Mode }) {
                 </label>
               ) : null}
               <label className="form-label">
+                ব্যাচ নির্বাচন
+                <select className="form-input" value={batch} onChange={(event) => setBatch(event.target.value)} required>
+                  {(isAdmission ? admissionBatchOptions : monthlyBatchOptions).map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {!isAdmission ? (
+                <label className="form-label">
+                  ল্যাব নির্বাচন
+                  <select className="form-input" value={lab} onChange={(event) => setLab(event.target.value)}>
+                    {labOptions.map(([value, label]) => (
+                      <option key={label} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
+              <label className="form-label">
                 ফোন নম্বর
                 <input
                   value={phone}
@@ -144,23 +180,23 @@ export function ResultLookup({ mode }: { mode: Mode }) {
               {lookupError ? <EmptyState text={lookupError} /> : null}
               {submitted && isAdmission ? (
                 admission ? (
-                  <div className="result-card">
-                    <div className="flex items-start justify-between gap-4">
+                  <div className="result-card elevated-result-card">
+                    <div className="result-card-head">
                       <div>
-                        <p className="text-sm font-bold text-zinc-500">প্রার্থী</p>
-                        <h2 className="mt-1 text-2xl font-black text-zinc-950">{admission.name}</h2>
+                        <p>প্রার্থী / {admission.batch}</p>
+                        <h2>{admission.name}</h2>
                       </div>
                       <div className="status-chip">
                         <BadgeCheck size={16} />
                         {admissionStatusBn[admission.status]}
                       </div>
                     </div>
-                    <div className="mt-6 grid grid-cols-3 gap-3">
+                    <div className="result-metric-grid">
                       <Metric label="লিখিত" value={admission.written} />
                       <Metric label="মৌখিক" value={admission.viva} />
                       <Metric label="মোট" value={admission.total} />
                     </div>
-                    <p className="mt-5 text-sm leading-6 text-zinc-600">
+                    <p className="result-safe-note">
                       দেওয়া রোল ও ফোন নম্বরের সঙ্গে মিল পাওয়া যাওয়ায় এই ব্যক্তিগত ফলাফল দেখানো হচ্ছে।
                     </p>
                   </div>
@@ -173,34 +209,34 @@ export function ResultLookup({ mode }: { mode: Mode }) {
                 monthly.length ? (
                   <div className="grid gap-3">
                     {monthly.map((item) => (
-                      <div key={`${item.phone}-${item.lab}-${item.month}-${item.subject}`} className="result-card">
-                        <div className="flex items-start justify-between gap-4">
+                      <div key={item.id} className="result-card elevated-result-card">
+                        <div className="result-card-head">
                           <div>
-                            <p className="text-sm font-bold text-zinc-500">{item.batch} / {item.lab} / {item.month}</p>
-                            <h2 className="mt-1 text-xl font-black text-zinc-950">{item.subject}</h2>
-                            <p className="mt-1 text-sm text-zinc-600">{item.name}</p>
+                            <p>{item.batch} / {item.lab} / {item.month}</p>
+                            <h2>{item.subject}</h2>
+                            <span>{item.name}</span>
                           </div>
                           <div className="grade-chip">
                             <Trophy size={16} />
                             {item.grade}
                           </div>
                         </div>
-                        <div className="mt-5 h-2 rounded-full bg-zinc-200">
+                        <div className="result-progress" aria-label={`নম্বর ${item.score} এর মধ্যে ${item.maxScore}`}>
                           <div
-                            className="h-2 rounded-full bg-[#118040]"
-                            style={{ width: `${(item.score / item.maxScore) * 100}%` }}
+                            style={{ width: `${Math.min(100, Math.max(0, (item.score / item.maxScore) * 100))}%` }}
                           />
                         </div>
-                        <p className="mt-3 text-sm text-zinc-600">
+                        <p className="result-score-line">
                           নম্বর: {item.score}/{item.maxScore}
                         </p>
-                        <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                          <Metric label="Merit" value={item.displayedMerit} />
-                          <Metric label="Overall" value={item.overallMerit} />
-                          <Metric label={item.lab} value={item.labMerit} />
+                        <div className="result-metric-grid">
+                          <Metric label="মেরিট" value={item.displayedMerit} />
+                          <Metric label="সার্বিক" value={item.overallMerit} />
+                          <Metric label={`${item.lab} মেরিট`} value={item.labMerit} />
                         </div>
-                        <p className="mt-3 text-xs font-bold text-zinc-500">
-                          {item.meritMode === "LAB_ONLY" ? "এই ফলাফলে lab-wise merit দেখানো হচ্ছে।" : "এই ফলাফলে সব lab মিলিয়ে merit দেখানো হচ্ছে।"}
+                        <p className="result-safe-note">
+                          <Layers3 size={14} />
+                          {item.meritMode === "LAB_ONLY" ? "এই ফলাফলে শুধু নির্বাচিত ল্যাবের মেরিট দেখানো হচ্ছে।" : "এই ফলাফলে সব ল্যাব মিলিয়ে মেরিট দেখানো হচ্ছে।"}
                         </p>
                       </div>
                     ))}

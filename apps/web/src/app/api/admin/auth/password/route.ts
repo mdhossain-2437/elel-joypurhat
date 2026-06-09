@@ -4,7 +4,7 @@ import { ADMIN_COOKIE, changeAdminPassword, createSessionToken } from "@/lib/aut
 import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
-  const limited = rateLimit(request, "admin-password-change", { limit: 5, windowMs: 10 * 60_000 });
+  const limited = rateLimit(request, "admin-password-change", { limit: 5, windowMs: 10 * 60_000, blockMs: 30 * 60_000 });
   if (limited) return limited;
 
   const session = await requireApiAdmin(request);

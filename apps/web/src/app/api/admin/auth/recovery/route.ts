@@ -3,7 +3,7 @@ import { recoverAdminPassword } from "@/lib/auth";
 import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
-  const limited = rateLimit(request, "admin-password-recovery", { limit: 4, windowMs: 15 * 60_000 });
+  const limited = rateLimit(request, "admin-password-recovery", { limit: 4, windowMs: 15 * 60_000, blockMs: 30 * 60_000 });
   if (limited) return limited;
 
   const body = (await request.json().catch(() => null)) as

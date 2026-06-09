@@ -341,6 +341,16 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
     setMessage("পাসওয়ার্ড পরিবর্তন হয়েছে। নতুন সেশন নিরাপদভাবে চালু আছে।");
   }
 
+  function updateAdmissionPopup(nextPopup: Partial<SiteSettings["admissionPopup"]>) {
+    setSettings({
+      ...settings,
+      admissionPopup: {
+        ...settings.admissionPopup,
+        ...nextPopup,
+      },
+    });
+  }
+
   return (
     <main className="admin-console">
       <section className="admin-console-hero">
@@ -386,21 +396,25 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
         </div>
       </section>
 
-      <nav className="admin-tabbar" aria-label="অ্যাডমিন সেকশন">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            className={activeTab === tab.id ? "active" : ""}
-            type="button"
-            onClick={() => setActiveTab(tab.id)}
-          >
-            <tab.icon size={17} />
-            {tab.label}
-          </button>
-        ))}
-      </nav>
+      <div className="admin-workspace">
+        <aside className="admin-sidebar">
+          <nav className="admin-tabbar" aria-label="অ্যাডমিন সেকশন">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                className={activeTab === tab.id ? "active" : ""}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+              >
+                <tab.icon size={17} />
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </aside>
 
-      {message ? <div className="admin-toast">{message}</div> : null}
+        <div className="admin-workspace-main">
+          {message ? <div className="admin-toast">{message}</div> : null}
 
       {activeTab === "overview" ? (
         <section className="admin-grid command-grid">
@@ -478,6 +492,31 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
             </button>
           </Panel>
 
+          <Panel title="ভর্তি পপআপ নিয়ন্ত্রণ" icon={Megaphone}>
+            <label className="admin-check">
+              <input
+                checked={settings.admissionPopup.enabled}
+                type="checkbox"
+                onChange={(event) => updateAdmissionPopup({ enabled: event.target.checked })}
+              />
+              ওয়েবসাইট load হলে ভর্তি পপআপ দেখান
+            </label>
+            <AdminInput label="পপআপ শিরোনাম" value={settings.admissionPopup.title} onChange={(value) => updateAdmissionPopup({ title: value })} />
+            <AdminInput label="বিস্তারিত" value={settings.admissionPopup.detail} onChange={(value) => updateAdmissionPopup({ detail: value })} textarea />
+            <AdminInput label="ছবির পথ / URL" value={settings.admissionPopup.image} onChange={(value) => updateAdmissionPopup({ image: value })} />
+            <AdminInput label="ছবির সাইজ নির্দেশনা" value={settings.admissionPopup.imageGuidance} onChange={(value) => updateAdmissionPopup({ imageGuidance: value })} textarea />
+            <div className="admin-form-grid">
+              <AdminInput label="আবেদন শুরুর তারিখ" type="date" value={settings.admissionPopup.startsAt} onChange={(value) => updateAdmissionPopup({ startsAt: value })} />
+              <AdminInput label="আবেদনের শেষ তারিখ" type="date" value={settings.admissionPopup.deadline} onChange={(value) => updateAdmissionPopup({ deadline: value })} />
+            </div>
+            <AdminInput label="Apply button link" value={settings.admissionPopup.applyHref} onChange={(value) => updateAdmissionPopup({ applyHref: value })} />
+            <AdminInput label="Button text" value={settings.admissionPopup.primaryLabel} onChange={(value) => updateAdmissionPopup({ primaryLabel: value })} />
+            <button className="button-primary" type="button" onClick={() => postJson("/api/admin/settings", settings, "ভর্তি পপআপ সেটিংস সংরক্ষণ করা হয়েছে।")}>
+              <UploadCloud size={17} />
+              পপআপ সেটিংস সংরক্ষণ
+            </button>
+          </Panel>
+
           <Panel title="লাইভ ব্রাঞ্চ প্রিভিউ" icon={Globe2}>
             <div className="admin-preview-card">
               <NextImage src="/media/elogo.png" alt="ই-লার্নিং এন্ড আর্নিং লিমিটেডের লোগো" width={190} height={70} style={{ width: "190px", height: "auto" }} />
@@ -486,12 +525,18 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
               <p>{settings.tagline}</p>
               <strong>{settings.activeBatch}</strong>
             </div>
+            <div className="admin-preview-card popup-preview-mini">
+              <span>{settings.admissionPopup.enabled ? "পপআপ চালু" : "পপআপ বন্ধ"}</span>
+              <h3>{settings.admissionPopup.title}</h3>
+              <p>{settings.admissionPopup.detail}</p>
+              <strong>{settings.admissionPopup.imageGuidance}</strong>
+            </div>
             <div className="admin-link-grid">
               {[
                 ["হোম", "/"],
                 ["কোর্স", "/courses"],
                 ["নোটিশ", "/notices"],
-                ["ভর্তি ফলাফল", "/results/admission"],
+                ["ফলাফল", "/results"],
                 ["মাসিক ফলাফল", "/results/monthly"],
               ].map(([label, href]) => (
                 <Link key={href} href={href} target="_blank">
@@ -1047,6 +1092,8 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
           </Panel>
         </section>
       ) : null}
+        </div>
+      </div>
     </main>
   );
 }
