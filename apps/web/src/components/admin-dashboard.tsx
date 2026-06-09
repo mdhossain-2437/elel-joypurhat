@@ -16,6 +16,7 @@ import {
   FileUp,
   Globe2,
   Images,
+  KeyRound,
   LayoutDashboard,
   LogOut,
   Megaphone,
@@ -117,6 +118,8 @@ const actionLabels: Record<string, string> = {
   UPDATE_TEAM_MEMBER: "টিম প্রোফাইল আপডেট",
   UPDATE_SITE_SETTINGS: "সাইট সেটিংস আপডেট",
   ADMIN_LOGIN: "অ্যাডমিন লগইন",
+  CHANGE_ADMIN_PASSWORD: "পাসওয়ার্ড পরিবর্তন",
+  RECOVER_ADMIN_PASSWORD: "পাসওয়ার্ড রিকভারি",
   CREATE_NOTICE: "নোটিশ তৈরি",
   UPDATE_NOTICE: "নোটিশ আপডেট",
   CREATE_COURSE: "কোর্স তৈরি",
@@ -156,6 +159,11 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
   const [settings, setSettings] = useState<SiteSettings>(initialStore.settings);
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [message, setMessage] = useState("");
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    nextPassword: "",
+    confirmPassword: "",
+  });
   const [importKind, setImportKind] = useState<"admission" | "monthly">("admission");
   const [importText, setImportText] = useState(resultImportSample.admission);
   const [importPublished, setImportPublished] = useState(true);
@@ -292,6 +300,24 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
     await fetch("/api/admin/auth/logout", { method: "POST" });
     router.replace("/admin/login");
     router.refresh();
+  }
+
+  async function changePassword() {
+    setMessage("পাসওয়ার্ড যাচাই করা হচ্ছে...");
+    const response = await fetch("/api/admin/auth/password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(passwordForm),
+    });
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+    if (!response.ok) {
+      setMessage(payload?.error || "পাসওয়ার্ড পরিবর্তন করা যায়নি।");
+      return;
+    }
+
+    setPasswordForm({ currentPassword: "", nextPassword: "", confirmPassword: "" });
+    await refreshStore();
+    setMessage("পাসওয়ার্ড পরিবর্তন হয়েছে। নতুন সেশন নিরাপদভাবে চালু আছে।");
   }
 
   return (
@@ -845,12 +871,41 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
 
       {activeTab === "security" ? (
         <section className="admin-two-col">
+          <Panel title="পাসওয়ার্ড পরিবর্তন" icon={KeyRound}>
+            <AdminInput
+              label="বর্তমান পাসওয়ার্ড"
+              type="password"
+              value={passwordForm.currentPassword}
+              onChange={(value) => setPasswordForm({ ...passwordForm, currentPassword: value })}
+            />
+            <AdminInput
+              label="নতুন পাসওয়ার্ড"
+              type="password"
+              value={passwordForm.nextPassword}
+              onChange={(value) => setPasswordForm({ ...passwordForm, nextPassword: value })}
+            />
+            <AdminInput
+              label="নতুন পাসওয়ার্ড আবার লিখুন"
+              type="password"
+              value={passwordForm.confirmPassword}
+              onChange={(value) => setPasswordForm({ ...passwordForm, confirmPassword: value })}
+            />
+            <div className="admin-help-text">
+              পাসওয়ার্ড কমপক্ষে ১২ অক্ষরের হবে এবং বড় letter, ছোট letter, number ও special character থাকবে। Password change করলে নতুন hash CMS database-এ save হবে।
+            </div>
+            <button className="button-primary" type="button" onClick={changePassword}>
+              <KeyRound size={17} />
+              পাসওয়ার্ড পরিবর্তন
+            </button>
+          </Panel>
+
           <Panel title="নিরাপত্তা নিয়ন্ত্রণ" icon={ShieldCheck}>
             <div className="security-list">
               {[
                 "নিরাপদ সেশন কুকি দিয়ে অ্যাডমিন লগইন",
                 "অ্যাডমিন রুটে সার্ভার-সাইড সুরক্ষা",
                 "কনটেন্ট ও ফলাফলের জন্য ভূমিকাভিত্তিক অনুরোধ নিয়ন্ত্রণ",
+                "পাসওয়ার্ড পরিবর্তন ও emergency recovery code ব্যবস্থা",
                 "শুধু ব্যক্তিগত ফলাফল দেখা, পাবলিক মেরিট তালিকা নয়",
                 "নিরাপত্তা হেডার ও কনটেন্ট সুরক্ষা নীতি সক্রিয়",
                 "প্রতিটি কনটেন্ট পরিবর্তনের অডিট লগ",
@@ -913,12 +968,14 @@ function AdminInput({
   onChange,
   textarea = false,
   placeholder,
+  type = "text",
 }: {
   label: string;
   value?: string;
   onChange: (value: string) => void;
   textarea?: boolean;
   placeholder?: string;
+  type?: string;
 }) {
   return (
     <label className="form-label">
@@ -926,7 +983,7 @@ function AdminInput({
       {textarea ? (
         <textarea className="form-input admin-textarea" value={value || ""} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />
       ) : (
-        <input className="form-input" value={value || ""} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />
+        <input className="form-input" type={type} value={value || ""} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />
       )}
     </label>
   );
@@ -1073,14 +1130,14 @@ function AdminDataTable({
           </thead>
           <tbody>
             {visibleRows.length ? visibleRows.map((row) => (
-              <tr key={row.id}>
+              <tr key={row.id} className={row.actions?.onPick ? "is-editable-row" : ""} onClick={row.actions?.onPick}>
                 {columns.map((column) => (
                   <td key={column.key} className={column.align === "right" ? "align-right" : ""}>
                     {row.cells[column.key] ?? "-"}
                   </td>
                 ))}
                 <td>
-                  <div className="admin-row-actions">
+                  <div className="admin-row-actions" onClick={(event) => event.stopPropagation()}>
                     {row.actions?.onPick ? <button type="button" onClick={row.actions.onPick}>সম্পাদনা</button> : null}
                     {row.actions?.onPublish ? <button type="button" onClick={row.actions.onPublish}>প্রকাশ</button> : null}
                     {row.actions?.onArchive ? <button type="button" onClick={row.actions.onArchive}>লুকান</button> : null}

@@ -74,6 +74,7 @@ export function sanitizeCmsStore(store: CmsStore) {
       status: admin.status,
       createdAt: admin.createdAt,
       lastLoginAt: admin.lastLoginAt,
+      passwordChangedAt: admin.passwordChangedAt || null,
     })),
   };
 }
@@ -81,6 +82,10 @@ export function sanitizeCmsStore(store: CmsStore) {
 function normalizeStore(store: CmsStore): CmsStore {
   return {
     ...store,
+    admins: (store.admins || []).map((admin) => ({
+      ...admin,
+      passwordChangedAt: admin.passwordChangedAt || null,
+    })),
     monthlyResults: (store.monthlyResults || []).map((row) => ({
       ...row,
       lab: row.lab || "Lab A",

@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "কোন কনটেন্টে কী কাজ করবেন তা পরিষ্কারভাবে দিতে হবে।" }, { status: 400 });
   }
 
-  const session = requireApiAdmin(request, [...(isResultCollection(body.collection) ? resultRoles : contentRoles)]);
+  const session = await requireApiAdmin(request, [...(isResultCollection(body.collection) ? resultRoles : contentRoles)]);
   if (session instanceof NextResponse) return session;
 
   if (body.action === "publish") {

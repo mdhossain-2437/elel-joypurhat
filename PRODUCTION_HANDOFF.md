@@ -30,6 +30,7 @@ DATABASE_URL=postgresql://...
 ADMIN_EMAIL=admin@example.com
 ADMIN_NAME=ELeL Joypurhat Admin
 ADMIN_PASSWORD_HASH=pbkdf2$iterations$salt$hash
+ADMIN_RECOVERY_TOKEN=private-owner-recovery-code
 ADMIN_SESSION_SECRET=long-random-secret
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
 SMS_API_KEY=
@@ -46,23 +47,31 @@ Credentials needed for final setup:
 - Email provider key if password reset or notice email is enabled.
 - A strong admin session secret generated for production only.
 - Private admin email and password hash. These must be set in Vercel/hosting env, not committed to GitHub.
+- Private recovery code for emergency admin password reset.
 
 ## Admin CMS
 
 Built-in admin features:
 - Secure admin login with session cookie.
 - Role-aware admin/API protection.
+- Admin password change from the Security tab.
+- Emergency password recovery using a private owner recovery code.
 - Notice, course, team, media and result management.
 - Admission result and monthly result publishing.
 - Monthly result Lab A, Lab B, Lab C support.
 - Monthly result all-lab merit and lab-wise merit mode.
 - CSV/TSV result import.
 - Data tables with search, status filter, column sort and row actions.
-- Imported result rows can be edited from the result database table.
+- Imported result rows can be clicked and edited from the result database table.
 - Publish, hide/archive and delete controls.
 - Audit log for content changes.
 
 Admin credentials are intentionally not published in this repository. The seed data contains only a locked placeholder admin; the real admin account is loaded from private environment variables. Share the login only with the project owner or authorized manager, then change it before final handoff.
+
+SMS and email API usage:
+- SMS API can send admission/result notices to selected candidates or students.
+- Email API can send password reset links, admin alerts and notice summaries.
+- Without SMS/Email provider credentials, the CMS still works; only automated sending will remain disabled.
 
 ## SEO Checklist
 

@@ -45,15 +45,16 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="site-container flex items-center justify-between gap-4 py-3">
         <Link href="/" className="brand-link" aria-label="হোম পেজে যান">
-          <Image
-            src="/media/elogo.png"
-            alt="ই-লার্নিং এন্ড আর্নিং লিমিটেডের লোগো"
-            width={168}
-            height={54}
-            className="brand-logo"
-            style={{ width: "168px", height: "auto" }}
-            priority
-          />
+          <span className="brand-logo-frame">
+            <Image
+              src="/media/elogo.png"
+              alt="ই-লার্নিং এন্ড আর্নিং লিমিটেডের লোগো"
+              fill
+              sizes="(max-width: 760px) 128px, 168px"
+              className="brand-logo-image"
+              priority
+            />
+          </span>
           <span>{branch.titleBn}</span>
         </Link>
 

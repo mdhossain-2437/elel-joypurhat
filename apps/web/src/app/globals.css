@@ -48,6 +48,7 @@ textarea {
 .site-shell {
   min-height: 100vh;
   background: var(--cream);
+  color: var(--ink);
 }
 
 .site-container {
@@ -73,9 +74,17 @@ textarea {
   text-decoration: none;
 }
 
-.brand-logo {
+.brand-logo-frame {
+  position: relative;
+  display: block;
   width: 168px;
-  height: auto;
+  aspect-ratio: 168 / 54;
+  flex-shrink: 0;
+}
+
+.brand-logo-image {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
@@ -300,9 +309,11 @@ textarea {
   display: inline-flex;
 }
 
-.footer-logo {
+.footer-logo-frame {
+  position: relative;
+  display: block;
   width: 178px;
-  height: auto;
+  aspect-ratio: 178 / 58;
 }
 
 .footer-brand strong {
@@ -1905,6 +1916,65 @@ textarea {
   padding: 24px;
 }
 
+.admin-login-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.auth-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+  padding-bottom: 16px;
+}
+
+.auth-card-heading svg {
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.auth-card-heading span {
+  display: block;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.auth-card-heading strong {
+  display: block;
+  margin-top: 3px;
+  color: #111;
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.auth-link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.recovery-card {
+  background:
+    linear-gradient(135deg, rgba(17, 128, 64, 0.07), transparent 42%),
+    white;
+}
+
+.auth-note {
+  margin-bottom: 14px;
+  color: #566156;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.65;
+}
+
 .form-label {
   display: grid;
   gap: 8px;
@@ -2570,6 +2640,14 @@ textarea {
   border-bottom: 0;
 }
 
+.admin-data-table tr.is-editable-row {
+  cursor: pointer;
+}
+
+.admin-data-table tr.is-editable-row:hover td {
+  background: rgba(17, 128, 64, 0.045);
+}
+
 .admin-data-table .align-right {
   text-align: right;
 }
@@ -2907,12 +2985,36 @@ textarea {
   font-weight: 900;
 }
 
+.admin-form-success {
+  margin-top: 12px;
+  border: 1px solid rgba(17, 128, 64, 0.18);
+  border-radius: 8px;
+  background: rgba(17, 128, 64, 0.08);
+  padding: 10px;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 900;
+}
+
 .admin-login-section {
   min-height: 72vh;
   padding: 86px 20px;
   background:
     linear-gradient(135deg, rgba(17, 128, 64, 0.09), transparent 36%),
     var(--cream);
+  color: var(--ink);
+}
+
+.admin-login-section .section-heading {
+  color: var(--ink);
+}
+
+.admin-login-section .kicker-light {
+  color: var(--green);
+}
+
+.admin-login-section .text-zinc-700 {
+  color: #475647;
 }
 
 .login-security-strip {
@@ -2954,7 +3056,7 @@ textarea {
     width: auto;
   }
 
-  .brand-logo {
+  .brand-logo-frame {
     width: 128px;
   }
 

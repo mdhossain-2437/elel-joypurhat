@@ -33,7 +33,9 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasAdminCookie = request.cookies.has(ADMIN_COOKIE);
   const isAdminPage = pathname.startsWith("/admin") && pathname !== "/admin/login";
-  const isProtectedAdminApi = pathname.startsWith("/api/admin") && !pathname.startsWith("/api/admin/auth/login");
+  const isPublicAdminAuthApi =
+    pathname.startsWith("/api/admin/auth/login") || pathname.startsWith("/api/admin/auth/recovery");
+  const isProtectedAdminApi = pathname.startsWith("/api/admin") && !isPublicAdminAuthApi;
 
   if (isAdminPage && !hasAdminCookie) {
     const loginUrl = request.nextUrl.clone();

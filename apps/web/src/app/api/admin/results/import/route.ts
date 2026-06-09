@@ -90,7 +90,7 @@ function normalizeMeritMode(value?: string): MonthlyResultEntry["meritMode"] {
 }
 
 export async function GET(request: NextRequest) {
-  const session = requireApiAdmin(request, [...resultRoles]);
+  const session = await requireApiAdmin(request, [...resultRoles]);
   if (session instanceof NextResponse) return session;
 
   const store = await readCmsStore();
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const session = requireApiAdmin(request, [...resultRoles]);
+  const session = await requireApiAdmin(request, [...resultRoles]);
   if (session instanceof NextResponse) return session;
 
   const body = (await request.json().catch(() => null)) as

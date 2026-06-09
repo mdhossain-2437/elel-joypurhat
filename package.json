@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "dev": "npm --workspace apps/web run dev",
+    "dev:3000": "npm --workspace apps/web run dev -- --hostname 0.0.0.0 --port 3000",
     "build": "npm --workspace apps/web run build",
     "lint": "npm --workspace apps/web run lint"
   },

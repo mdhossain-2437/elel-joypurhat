@@ -23,6 +23,7 @@ export type AdminUser = {
   passwordHash: string;
   createdAt: string;
   lastLoginAt: string | null;
+  passwordChangedAt?: string | null;
 };
 
 export type NoticeEntry = {

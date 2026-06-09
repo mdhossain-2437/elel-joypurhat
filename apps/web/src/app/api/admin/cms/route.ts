@@ -3,7 +3,7 @@ import { requireApiAdmin } from "@/lib/api-auth";
 import { readCmsStore, sanitizeCmsStore } from "@/lib/cms-store";
 
 export async function GET(request: NextRequest) {
-  const session = requireApiAdmin(request);
+  const session = await requireApiAdmin(request);
   if (session instanceof NextResponse) return session;
 
   const store = await readCmsStore();

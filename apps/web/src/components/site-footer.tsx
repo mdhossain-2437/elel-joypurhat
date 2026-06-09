@@ -18,14 +18,15 @@ export function SiteFooter() {
       <div className="site-container footer-grid">
         <div className="footer-brand">
           <Link href="/" aria-label="হোম পেজে যান">
-            <Image
-              src="/media/elogo.png"
-              alt="ই-লার্নিং এন্ড আর্নিং লিমিটেডের লোগো"
-              width={178}
-              height={58}
-              className="footer-logo"
-              style={{ width: "178px", height: "auto" }}
-            />
+            <span className="footer-logo-frame">
+              <Image
+                src="/media/elogo.png"
+                alt="ই-লার্নিং এন্ড আর্নিং লিমিটেডের লোগো"
+                fill
+                sizes="178px"
+                className="brand-logo-image"
+              />
+            </span>
           </Link>
           <strong>{branch.titleBn}</strong>
           <p>{branch.tagline}</p>

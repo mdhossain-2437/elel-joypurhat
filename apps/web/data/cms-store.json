@@ -19,7 +19,8 @@
       "status": "SUSPENDED",
       "passwordHash": "",
       "createdAt": "2026-06-08T17:30:00.000Z",
-      "lastLoginAt": null
+      "lastLoginAt": null,
+      "passwordChangedAt": null
     }
   ],
   "notices": [

@@ -6,7 +6,7 @@ import type { CourseEntry } from "@/lib/cms-types";
 const contentRoles = ["OWNER", "SUPER_ADMIN", "ADMIN", "EDITOR"] as const;
 
 export async function POST(request: NextRequest) {
-  const session = requireApiAdmin(request, [...contentRoles]);
+  const session = await requireApiAdmin(request, [...contentRoles]);
   if (session instanceof NextResponse) return session;
 
   const body = (await request.json().catch(() => null)) as Partial<CourseEntry> | null;

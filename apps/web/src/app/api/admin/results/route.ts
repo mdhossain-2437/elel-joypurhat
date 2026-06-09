@@ -6,7 +6,7 @@ import type { AdmissionResultEntry, MonthlyResultEntry } from "@/lib/cms-types";
 const resultRoles = ["OWNER", "SUPER_ADMIN", "ADMIN", "RESULT_MANAGER"] as const;
 
 export async function POST(request: NextRequest) {
-  const session = requireApiAdmin(request, [...resultRoles]);
+  const session = await requireApiAdmin(request, [...resultRoles]);
   if (session instanceof NextResponse) return session;
 
   const body = (await request.json().catch(() => null)) as
