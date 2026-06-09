@@ -40,6 +40,7 @@ import type {
   NoticeEntry,
   PublishStatus,
   SiteSettings,
+  SuccessStoryEntry,
   TeamMemberEntry,
 } from "@/lib/cms-types";
 import { branch } from "@/lib/content";
@@ -54,7 +55,7 @@ type AdminSession = {
 
 type SafeAdmin = Omit<AdminUser, "passwordHash">;
 type SafeStore = Omit<CmsStore, "admins"> & { admins: SafeAdmin[] };
-type TabId = "overview" | "settings" | "notices" | "courses" | "results" | "team" | "media" | "security";
+type TabId = "overview" | "settings" | "notices" | "courses" | "results" | "team" | "stories" | "media" | "security";
 
 const tabs: Array<{ id: TabId; label: string; icon: LucideIcon }> = [
   { id: "overview", label: "ড্যাশবোর্ড", icon: LayoutDashboard },
@@ -63,6 +64,7 @@ const tabs: Array<{ id: TabId; label: string; icon: LucideIcon }> = [
   { id: "courses", label: "কোর্স", icon: BookOpenCheck },
   { id: "results", label: "ফলাফল", icon: BadgeCheck },
   { id: "team", label: "টিম", icon: UsersRound },
+  { id: "stories", label: "গল্প", icon: Sparkles },
   { id: "media", label: "মিডিয়া", icon: Images },
   { id: "security", label: "নিরাপত্তা", icon: ShieldCheck },
 ];
@@ -116,6 +118,7 @@ function displayAdminValue(value: string) {
 const actionLabels: Record<string, string> = {
   UPDATE_MEDIA_ASSET: "মিডিয়া আপডেট",
   UPDATE_TEAM_MEMBER: "টিম প্রোফাইল আপডেট",
+  UPDATE_SUCCESS_STORY: "সাফল্যের গল্প আপডেট",
   UPDATE_SITE_SETTINGS: "সাইট সেটিংস আপডেট",
   ADMIN_LOGIN: "অ্যাডমিন লগইন",
   CHANGE_ADMIN_PASSWORD: "পাসওয়ার্ড পরিবর্তন",
@@ -125,22 +128,26 @@ const actionLabels: Record<string, string> = {
   CREATE_COURSE: "কোর্স তৈরি",
   UPDATE_COURSE: "কোর্স আপডেট",
   CREATE_TEAM_MEMBER: "টিম প্রোফাইল তৈরি",
+  CREATE_SUCCESS_STORY: "সাফল্যের গল্প তৈরি",
   CREATE_MEDIA_ASSET: "মিডিয়া যুক্ত",
   DELETE_NOTICE: "নোটিশ মুছে ফেলা",
   DELETE_COURSE: "কোর্স মুছে ফেলা",
   DELETE_TEAM_MEMBER: "টিম প্রোফাইল মুছে ফেলা",
+  DELETE_SUCCESS_STORY: "সাফল্যের গল্প মুছে ফেলা",
   DELETE_MEDIA_ASSET: "মিডিয়া মুছে ফেলা",
   DELETE_ADMISSION_RESULT: "ভর্তি ফলাফল মুছে ফেলা",
   DELETE_MONTHLY_RESULT: "মাসিক ফলাফল মুছে ফেলা",
   ARCHIVE_NOTICE: "নোটিশ আর্কাইভে রাখা",
   ARCHIVE_COURSE: "কোর্স আর্কাইভে রাখা",
   ARCHIVE_TEAM_MEMBER: "টিম প্রোফাইল আর্কাইভে রাখা",
+  ARCHIVE_SUCCESS_STORY: "সাফল্যের গল্প আর্কাইভে রাখা",
   ARCHIVE_MEDIA_ASSET: "মিডিয়া আর্কাইভে রাখা",
   ARCHIVE_ADMISSION_RESULT: "ভর্তি ফলাফল লুকানো",
   ARCHIVE_MONTHLY_RESULT: "মাসিক ফলাফল লুকানো",
   PUBLISH_NOTICE: "নোটিশ প্রকাশ",
   PUBLISH_COURSE: "কোর্স হোমে দেখানো",
   PUBLISH_TEAM_MEMBER: "টিম প্রোফাইল প্রকাশ",
+  PUBLISH_SUCCESS_STORY: "সাফল্যের গল্প প্রকাশ",
   PUBLISH_MEDIA_ASSET: "মিডিয়া প্রকাশ",
   PUBLISH_ADMISSION_RESULT: "ভর্তি ফলাফল প্রকাশ",
   PUBLISH_MONTHLY_RESULT: "মাসিক ফলাফল প্রকাশ",
@@ -216,6 +223,19 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
     sortOrder: initialStore.teamMembers.length + 1,
     bio: "দায়িত্ব, অভিজ্ঞতা ও শিক্ষার্থী সহায়তার ভূমিকা সংক্ষেপে লিখুন।",
   });
+  const [successStory, setSuccessStory] = useState<Partial<SuccessStoryEntry>>({
+    name: "নতুন শিক্ষার্থী",
+    batch: "৬ষ্ঠ ব্যাচ",
+    course: "যুব উন্নয়ন ফ্রিল্যান্সিং প্রশিক্ষণ",
+    image: "/media/team/halima-akter.jpg",
+    title: "ক্লাস অনুশীলন থেকে আত্মবিশ্বাস তৈরি",
+    excerpt: "নিয়মিত ক্লাস, অনুশীলন ও প্রশিক্ষকের ফিডব্যাকে শিক্ষার্থী নিজের কাজ গুছিয়ে উপস্থাপন করতে শিখেছে।",
+    story: "শুরুর দিকে অনলাইন কাজের ধাপগুলো জটিল মনে হলেও নিয়মিত ল্যাব ক্লাস, ছোট টাস্ক এবং ফিডব্যাকের মাধ্যমে শিক্ষার্থী ধীরে ধীরে আত্মবিশ্বাস পেয়েছে।",
+    achievement: "প্রথম পোর্টফোলিও প্রস্তুত",
+    status: "DRAFT",
+    featured: true,
+    sortOrder: initialStore.successStories.length + 1,
+  });
   const [mediaAsset, setMediaAsset] = useState<Partial<MediaAssetEntry>>({
     title: "নতুন মিডিয়া ফাইল",
     kind: "IMAGE",
@@ -231,6 +251,7 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
       ["ভর্তি অবস্থা", store.settings.admissionStatus],
       ["প্রকাশিত নোটিশ", String(store.notices.filter((item) => item.status === "PUBLISHED").length)],
       ["টিম প্রোফাইল", String(store.teamMembers.filter((item) => item.status === "PUBLISHED").length)],
+      ["সাফল্যের গল্প", String(store.successStories.filter((item) => item.status === "PUBLISHED").length)],
       ["কোর্স", String(store.courses.length)],
       ["মিডিয়া", String(store.mediaAssets.length)],
     ],
@@ -272,7 +293,7 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
   }
 
   async function runCmsAction(
-    collection: "notices" | "courses" | "teamMembers" | "mediaAssets" | "admissionResults" | "monthlyResults",
+    collection: "notices" | "courses" | "teamMembers" | "successStories" | "mediaAssets" | "admissionResults" | "monthlyResults",
     id: string,
     action: "publish" | "archive" | "delete",
   ) {
@@ -809,6 +830,86 @@ export function AdminDashboard({ admin, initialStore }: { admin: AdminSession; i
                   onPublish: () => runCmsAction("teamMembers", item.id, "publish"),
                   onArchive: () => runCmsAction("teamMembers", item.id, "archive"),
                   onDelete: () => runCmsAction("teamMembers", item.id, "delete"),
+                },
+              }))}
+            />
+          </Panel>
+        </section>
+      ) : null}
+
+      {activeTab === "stories" ? (
+        <section className="admin-two-col">
+          <Panel title="সাফল্যের গল্প সম্পাদনা" icon={Sparkles}>
+            <AdminInput label="শিক্ষার্থীর নাম" value={successStory.name} onChange={(value) => setSuccessStory({ ...successStory, name: value })} />
+            <AdminInput label="ব্যাচ" value={successStory.batch} onChange={(value) => setSuccessStory({ ...successStory, batch: value })} placeholder="যেমন: ৬ষ্ঠ ব্যাচ" />
+            <AdminInput label="কোর্স" value={successStory.course} onChange={(value) => setSuccessStory({ ...successStory, course: value })} />
+            <AdminInput label="ছবির পথ" value={successStory.image} onChange={(value) => setSuccessStory({ ...successStory, image: value })} placeholder="/media/team/halima-akter.jpg" />
+            <AdminInput label="গল্পের শিরোনাম" value={successStory.title} onChange={(value) => setSuccessStory({ ...successStory, title: value })} />
+            <AdminInput label="হোমপেজে দেখানোর সংক্ষিপ্ত লেখা" value={successStory.excerpt} onChange={(value) => setSuccessStory({ ...successStory, excerpt: value })} textarea />
+            <AdminInput label="পূর্ণ গল্প" value={successStory.story} onChange={(value) => setSuccessStory({ ...successStory, story: value })} textarea />
+            <AdminInput label="বর্তমান অগ্রগতি / অর্জন" value={successStory.achievement} onChange={(value) => setSuccessStory({ ...successStory, achievement: value })} />
+            <div className="admin-form-grid">
+              <AdminSelect label="অবস্থা" value={successStory.status || "DRAFT"} options={publishOptions} onChange={(value) => setSuccessStory({ ...successStory, status: value as PublishStatus })} />
+              <AdminInput label="প্রদর্শনের ক্রম" value={String(successStory.sortOrder ?? "")} onChange={(value) => setSuccessStory({ ...successStory, sortOrder: Number(value) })} />
+            </div>
+            <label className="admin-check">
+              <input
+                checked={Boolean(successStory.featured)}
+                type="checkbox"
+                onChange={(event) => setSuccessStory({ ...successStory, featured: event.target.checked })}
+              />
+              হোমপেজের marquee section-এ আগে দেখান
+            </label>
+            <button className="button-primary" type="button" onClick={() => postJson("/api/admin/success-stories", successStory, "সাফল্যের গল্প সংরক্ষণ করা হয়েছে।")}>
+              <UploadCloud size={17} />
+              গল্প সংরক্ষণ
+            </button>
+            <p className="admin-help-text">প্রকাশিত গল্প হোমপেজে marquee হিসেবে দেখাবে এবং /success-stories পেজে ৯টি করে pagination সহ যাবে।</p>
+          </Panel>
+
+          <Panel title="সাফল্যের গল্প ডেটাবেস" icon={DatabaseZap}>
+            <AdminDataTable
+              searchPlaceholder="নাম, ব্যাচ, কোর্স বা অর্জন লিখুন"
+              statusOptions={[
+                ...publishOptions.map((value) => ({ value, label: displayAdminValue(value) })),
+                { value: "FEATURED", label: "হোমে আগে দেখানো" },
+              ]}
+              initialSortKey="sortOrder"
+              columns={[
+                { key: "sortOrder", label: "ক্রম", sortable: true, align: "right" },
+                { key: "name", label: "নাম", sortable: true },
+                { key: "batch", label: "ব্যাচ", sortable: true },
+                { key: "course", label: "কোর্স", sortable: true },
+                { key: "featured", label: "হোম", sortable: true },
+                { key: "status", label: "অবস্থা", sortable: true },
+              ]}
+              rows={store.successStories.map((item) => ({
+                id: item.id,
+                statusValue: item.status,
+                statusLabel: displayAdminValue(item.status),
+                filterValues: [item.status, item.featured ? "FEATURED" : ""],
+                searchText: [item.name, item.batch, item.course, item.title, item.excerpt, item.achievement, item.status].join(" "),
+                sortValues: {
+                  sortOrder: item.sortOrder,
+                  name: item.name,
+                  batch: item.batch,
+                  course: item.course,
+                  featured: item.featured,
+                  status: item.status,
+                },
+                cells: {
+                  sortOrder: item.sortOrder,
+                  name: <strong>{item.name}</strong>,
+                  batch: item.batch,
+                  course: item.course,
+                  featured: item.featured ? "হ্যাঁ" : "না",
+                  status: displayAdminValue(item.status),
+                },
+                actions: {
+                  onPick: () => setSuccessStory(item),
+                  onPublish: () => runCmsAction("successStories", item.id, "publish"),
+                  onArchive: () => runCmsAction("successStories", item.id, "archive"),
+                  onDelete: () => runCmsAction("successStories", item.id, "delete"),
                 },
               }))}
             />

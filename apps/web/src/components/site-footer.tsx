@@ -7,6 +7,7 @@ const quickLinks = [
   ["হোম", "/"],
   ["কোর্স", "/courses"],
   ["প্রকল্প", "/projects"],
+  ["শিক্ষার্থীর গল্প", "/success-stories"],
   ["নোটিশ", "/notices"],
   ["ভর্তি ফলাফল", "/results/admission"],
   ["মাসিক ফলাফল", "/results/monthly"],

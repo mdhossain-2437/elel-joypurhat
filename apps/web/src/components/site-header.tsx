@@ -10,6 +10,7 @@ const navItems: Array<[string, string]> = [
   ["হোম", "/"],
   ["কোর্স", "/courses"],
   ["প্রকল্প", "/projects"],
+  ["গল্প", "/success-stories"],
   ["নোটিশ", "/notices"],
   ["ফলাফল", "/results/admission"],
   ["যোগাযোগ", "/#contact"],

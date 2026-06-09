@@ -12,6 +12,7 @@ import type {
   PublicAdmissionResult,
   PublicMonthlyResult,
   SiteSettings,
+  SuccessStoryEntry,
   TeamMemberEntry,
 } from "@/lib/cms-types";
 
@@ -20,6 +21,7 @@ export type CmsActionCollection =
   | "notices"
   | "courses"
   | "teamMembers"
+  | "successStories"
   | "mediaAssets"
   | "admissionResults"
   | "monthlyResults";
@@ -92,6 +94,7 @@ function normalizeStore(store: CmsStore): CmsStore {
       meritMode: row.meritMode || "COMBINED",
     })),
     teamMembers: store.teamMembers || [],
+    successStories: store.successStories || [],
     mediaAssets: store.mediaAssets || [],
     auditLogs: store.auditLogs || [],
   };
@@ -102,6 +105,7 @@ function actionName(collection: CmsActionCollection, mode: "DELETE" | "ARCHIVE" 
     notices: "NOTICE",
     courses: "COURSE",
     teamMembers: "TEAM_MEMBER",
+    successStories: "SUCCESS_STORY",
     mediaAssets: "MEDIA_ASSET",
     admissionResults: "ADMISSION_RESULT",
     monthlyResults: "MONTHLY_RESULT",
@@ -130,6 +134,12 @@ export async function deleteCmsEntry(collection: CmsActionCollection, id: string
     const before = store.teamMembers.length;
     store.teamMembers = store.teamMembers.filter((item) => item.id !== id);
     deleted = store.teamMembers.length !== before;
+  }
+
+  if (collection === "successStories") {
+    const before = store.successStories.length;
+    store.successStories = store.successStories.filter((item) => item.id !== id);
+    deleted = store.successStories.length !== before;
   }
 
   if (collection === "mediaAssets") {
@@ -170,7 +180,7 @@ export async function archiveCmsEntry(collection: CmsActionCollection, id: strin
   const timestamp = now();
   let changed = false;
 
-  if (collection === "notices" || collection === "teamMembers" || collection === "mediaAssets") {
+  if (collection === "notices" || collection === "teamMembers" || collection === "successStories" || collection === "mediaAssets") {
     const item = store[collection].find((entry) => entry.id === id);
     if (item) {
       item.status = "ARCHIVED";
@@ -218,7 +228,7 @@ export async function publishCmsEntry(collection: CmsActionCollection, id: strin
   const timestamp = now();
   let changed = false;
 
-  if (collection === "notices" || collection === "teamMembers" || collection === "mediaAssets") {
+  if (collection === "notices" || collection === "teamMembers" || collection === "successStories" || collection === "mediaAssets") {
     const item = store[collection].find((entry) => entry.id === id);
     if (item) {
       item.status = "PUBLISHED";
@@ -277,6 +287,13 @@ export async function getPublishedTeamMembers() {
   return store.teamMembers
     .filter((member) => member.status === "PUBLISHED")
     .toSorted((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name));
+}
+
+export async function getPublishedSuccessStories() {
+  const store = await readCmsStore();
+  return store.successStories
+    .filter((story) => story.status === "PUBLISHED")
+    .toSorted((a, b) => Number(b.featured) - Number(a.featured) || a.sortOrder - b.sortOrder || b.updatedAt.localeCompare(a.updatedAt));
 }
 
 export async function getPublishedMediaAssets() {
@@ -500,6 +517,47 @@ export async function upsertTeamMember(input: Partial<TeamMemberEntry>, actor: s
 
   await writeCmsStore(store);
   return nextMember;
+}
+
+export async function upsertSuccessStory(input: Partial<SuccessStoryEntry>, actor: string) {
+  const store = await readCmsStore();
+  const timestamp = now();
+  const slugSource = input.name || input.title || newId("story");
+  const id = input.id || `story-${slugSource.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const existingIndex = store.successStories.findIndex((story) => story.id === id);
+  const nextStory: SuccessStoryEntry = {
+    id,
+    name: input.name?.trim() || "নতুন শিক্ষার্থী",
+    batch: input.batch?.trim() || "৬ষ্ঠ ব্যাচ",
+    course: input.course?.trim() || "যুব উন্নয়ন ফ্রিল্যান্সিং প্রশিক্ষণ",
+    image: input.image?.trim() || "/media/team/halima-akter.jpg",
+    title: input.title?.trim() || "শেখার নতুন আত্মবিশ্বাস",
+    excerpt: input.excerpt?.trim() || "ক্লাসের নিয়মিত অনুশীলন ও শিক্ষক সহায়তায় শিক্ষার্থী নিজের কাজের আত্মবিশ্বাস তৈরি করেছে।",
+    story: input.story?.trim() || "শুরুর দিকে অনলাইন কাজের নিয়ম বুঝতে সময় লাগলেও নিয়মিত ল্যাব অনুশীলন, ক্লাস টাস্ক এবং ফিডব্যাকের মাধ্যমে ধীরে ধীরে কাজের গতি তৈরি হয়েছে।",
+    achievement: input.achievement?.trim() || "পোর্টফোলিও প্রস্তুত",
+    status: input.status || "DRAFT",
+    featured: Boolean(input.featured),
+    sortOrder: Number(input.sortOrder ?? store.successStories.length + 1),
+    updatedAt: timestamp,
+  };
+
+  if (existingIndex >= 0) {
+    store.successStories[existingIndex] = nextStory;
+  } else {
+    store.successStories.push(nextStory);
+  }
+
+  store.auditLogs.unshift({
+    id: newId("audit"),
+    actor,
+    action: existingIndex >= 0 ? "UPDATE_SUCCESS_STORY" : "CREATE_SUCCESS_STORY",
+    target: id,
+    createdAt: timestamp,
+    meta: nextStory.status,
+  });
+
+  await writeCmsStore(store);
+  return nextStory;
 }
 
 export async function upsertMediaAsset(input: Partial<MediaAssetEntry>, actor: string) {

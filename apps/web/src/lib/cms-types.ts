@@ -91,6 +91,22 @@ export type TeamMemberEntry = {
   updatedAt: string;
 };
 
+export type SuccessStoryEntry = {
+  id: string;
+  name: string;
+  batch: string;
+  course: string;
+  image: string;
+  title: string;
+  excerpt: string;
+  story: string;
+  achievement: string;
+  status: PublishStatus;
+  featured: boolean;
+  sortOrder: number;
+  updatedAt: string;
+};
+
 export type MediaAssetEntry = {
   id: string;
   title: string;
@@ -121,6 +137,7 @@ export type CmsStore = {
   admissionResults: AdmissionResultEntry[];
   monthlyResults: MonthlyResultEntry[];
   teamMembers: TeamMemberEntry[];
+  successStories: SuccessStoryEntry[];
   mediaAssets: MediaAssetEntry[];
   auditLogs: AuditLogEntry[];
 };

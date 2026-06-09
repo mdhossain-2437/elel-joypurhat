@@ -13,6 +13,7 @@ const collections: CmsActionCollection[] = [
   "notices",
   "courses",
   "teamMembers",
+  "successStories",
   "mediaAssets",
   "admissionResults",
   "monthlyResults",

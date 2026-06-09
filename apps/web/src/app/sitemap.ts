@@ -5,6 +5,7 @@ const routes = [
   "/courses",
   "/courses/jubo-freelancing",
   "/projects",
+  "/success-stories",
   "/notices",
   "/results/admission",
   "/results/monthly",

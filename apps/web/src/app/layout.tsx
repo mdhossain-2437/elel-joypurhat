@@ -108,8 +108,9 @@ export default function RootLayout({
     <html
       lang="bn"
       className={`${geistSans.variable} ${geistMono.variable} ${notoBangla.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <StructuredData />
         <SiteHeader />
         <div className="flex-1">{children}</div>

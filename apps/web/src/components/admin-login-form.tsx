@@ -78,15 +78,15 @@ export function AdminLoginForm() {
   }
 
   return (
-    <div className="admin-login-stack">
+    <section className="admin-login-stack" suppressHydrationWarning>
       <form className="admin-login-card" onSubmit={handleSubmit}>
-        <div className="auth-card-heading">
+        <header className="auth-card-heading" suppressHydrationWarning>
           <LockKeyhole size={19} />
-          <div>
+          <span className="auth-card-copy" suppressHydrationWarning>
             <span>Admin access</span>
             <strong>Secure sign in</strong>
-          </div>
-        </div>
+          </span>
+        </header>
         <label className="form-label">
           ইমেইল
           <input className="form-input" value={email} autoComplete="email" onChange={(event) => setEmail(event.target.value)} />
@@ -114,13 +114,13 @@ export function AdminLoginForm() {
 
       {recoveryOpen ? (
         <form className="admin-login-card recovery-card" onSubmit={handleRecovery}>
-          <div className="auth-card-heading">
+          <header className="auth-card-heading" suppressHydrationWarning>
             <RotateCcw size={19} />
-            <div>
+            <span className="auth-card-copy" suppressHydrationWarning>
               <span>Emergency reset</span>
               <strong>Recovery code দিয়ে নতুন পাসওয়ার্ড সেট করুন</strong>
-            </div>
-          </div>
+            </span>
+          </header>
           <p className="auth-note">
             Recovery code শুধু owner-এর private env-এ থাকবে। SMS/Email provider যুক্ত হলে এখান থেকে reset link পাঠানো যাবে।
           </p>
@@ -148,6 +148,6 @@ export function AdminLoginForm() {
           </button>
         </form>
       ) : null}
-    </div>
+    </section>
   );
 }

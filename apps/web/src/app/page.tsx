@@ -15,9 +15,10 @@ import {
   UsersRound,
 } from "lucide-react";
 import { InstituteCanvas } from "@/components/institute-canvas";
+import { SuccessStoryMarquee } from "@/components/success-story-marquee";
 import { TeamShowcase } from "@/components/team-showcase";
 import { admissionNotice, branch, contactItems } from "@/lib/content";
-import { getCourses, getPublishedTeamMembers } from "@/lib/cms-store";
+import { getCourses, getPublishedSuccessStories, getPublishedTeamMembers } from "@/lib/cms-store";
 
 export const dynamic = "force-dynamic";
 
@@ -80,10 +81,12 @@ const instituteSystems = [
   },
 ];
 
-const experiencePasses = [
-  ["ভর্তি পাস", "শেষ সময়, পরীক্ষা, যোগ্যতা ও অ্যাডমিট কার্ডের নির্দেশনা এক জায়গায় দেখা যাবে।", "১৫ জুন"],
-  ["ক্লাস পাস", "সরাসরি ল্যাব ক্লাস, অনুশীলন, উপস্থিতি ও শিক্ষকের সহায়তা নিয়মিতভাবে চলবে।", "৬০০ ঘণ্টা"],
-  ["ফলাফল পাস", "ভর্তি ও মাসিক পরীক্ষার ব্যক্তিগত ফলাফল নিরাপদভাবে খুঁজে পাওয়া যাবে।", "রোল/ফোন"],
+const studentFlow = [
+  ["আবেদন", "শেষ সময়, যোগ্যতা, পরীক্ষা ও অ্যাডমিট কার্ডের নির্দেশনা একই জায়গা থেকে পরিষ্কারভাবে জানা যাবে।", "১৫ জুন"],
+  ["প্রস্তুতি", "লিখিত ও মৌখিক পরীক্ষার আগে কী করতে হবে, কোন তথ্য সঙ্গে রাখতে হবে—সবকিছু সহজ ভাষায় সাজানো থাকবে।", "২০-২১ জুন"],
+  ["ক্লাস", "নির্দিষ্ট ল্যাবে সরাসরি ক্লাস, হাতে-কলমে অনুশীলন, উপস্থিতি ও প্রশিক্ষকের ফিডব্যাক নিয়মিত চলবে।", "৬০০ ঘণ্টা"],
+  ["মূল্যায়ন", "ক্লাস টেস্ট ও মাসিক মূল্যায়নের ফলাফল নিজের ফোন নম্বর দিয়ে নিরাপদে দেখা যাবে।", "নিজস্ব ফলাফল"],
+  ["সহায়তা", "কোর্স, নোটিশ, ফলাফল বা ডকুমেন্ট নিয়ে সমস্যা হলে ব্রাঞ্চ টিমের সঙ্গে দ্রুত যোগাযোগ করা যাবে।", "ব্রাঞ্চ সাপোর্ট"],
 ];
 
 const lessonPath = [
@@ -103,6 +106,7 @@ function getCourseIcon(type: string) {
 export default async function Home() {
   const featuredCourses = (await getCourses()).filter((course) => course.featured).slice(0, 3);
   const teamMembers = await getPublishedTeamMembers();
+  const successStories = await getPublishedSuccessStories();
 
   return (
     <main className="site-shell">
@@ -184,17 +188,17 @@ export default async function Home() {
         <div className="site-container">
           <div className="experience-pass-head">
             <div>
-              <p className="kicker-light">ইনস্টিটিউট অভিজ্ঞতা</p>
-              <h2 className="section-heading mt-4">একটি ওয়েবসাইট নয়, শিক্ষার্থীর জন্য সম্পূর্ণ পথনির্দেশ।</h2>
+              <p className="kicker-light">শিক্ষার্থীর পথচলা</p>
+              <h2 className="section-heading mt-4">প্রথম আবেদন থেকে ক্লাসের অগ্রগতি—সব ধাপ যেন সামনে দেখা যায়।</h2>
             </div>
             <p>
-              ভর্তি থেকে ক্লাস, মূল্যায়ন, ফলাফল ও ব্রাঞ্চ সহায়তা—প্রতিটি ধাপ এমনভাবে সাজানো হয়েছে, যেন নতুন শিক্ষার্থীও দ্রুত বুঝতে পারে তার পরবর্তী কাজ কী।
+              নতুন শিক্ষার্থীর সবচেয়ে বড় প্রয়োজন হলো পরিষ্কার নির্দেশনা। তাই ভর্তি, পরীক্ষা, ক্লাস, মূল্যায়ন ও সহায়তার তথ্য গল্পের মতো ধারাবাহিকভাবে সাজানো হয়েছে—আজ কী করবেন, আগামী ধাপে কী আসবে, কোথায় সাহায্য পাবেন।
             </p>
           </div>
           <div className="experience-pass-grid">
-            {experiencePasses.map(([title, text, badge], index) => (
+            {studentFlow.map(([title, text, badge], index) => (
               <article key={title} className="experience-pass-card">
-                <span>PASS 0{index + 1}</span>
+                <span>{String(index + 1).padStart(2, "0")}</span>
                 <strong>{badge}</strong>
                 <h3>{title}</h3>
                 <p>{text}</p>
@@ -203,6 +207,8 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      <SuccessStoryMarquee stories={successStories} />
 
       <section className="lesson-journey-section">
         <div className="site-container lesson-journey-grid">
