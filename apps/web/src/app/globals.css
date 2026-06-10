@@ -40,7 +40,6 @@
   --color-foreground: var(--foreground);
   --font-sans: "Geist", "Geist Fallback", "Noto Sans Bengali", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
-  --font-display: var(--font-display), "Noto Sans Bengali", serif;
 }
 
 body {
@@ -3874,19 +3873,21 @@ textarea {
 
 /* Serif-italic display accent (designmonks/devmonks signature). Apply to a
    word inside a heading: <span class="accent">পথচিত্র</span> */
+/* Brand-color accent word inside a heading. Keeps the heading's own Bengali
+   font and weight (no serif/italic) so Bengali text renders without overflow. */
 .accent,
 .section-heading .accent,
 .hero-heading .accent,
 .architecture-head h1 span.accent,
 .architecture-head h2 span.accent {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 500;
+  font-family: inherit;
+  font-style: normal;
+  font-weight: inherit;
   background: var(--grad-brand);
   -webkit-background-clip: text;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
   color: transparent;
-  padding-inline: 0.04em;
 }
 
 .hero-heading,

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Geist, Geist_Mono, Noto_Sans_Bengali } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Sans_Bengali } from "next/font/google";
 import { AdmissionPopup } from "@/components/admission-popup";
 import { StructuredData } from "@/components/structured-data";
 import { SiteFooter } from "@/components/site-footer";
@@ -23,12 +23,6 @@ const notoBangla = Noto_Sans_Bengali({
   weight: ["400", "500", "600", "700", "800", "900"],
 });
 
-const fraunces = Fraunces({
-  variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["italic", "normal"],
-});
 
 const baseOpenGraph = {
   title: "ই-লার্নিং এন্ড আর্নিং লিমিটেড — জয়পুরহাট ব্রাঞ্চ",
@@ -120,7 +114,7 @@ export default async function RootLayout({
     <html
       lang="bn"
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} ${notoBangla.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${notoBangla.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
