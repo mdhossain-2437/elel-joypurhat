@@ -1,5 +1,19 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [
+    "NODE_ENV",
+    "VERCEL",
+    "NEXT_PUBLIC_SITE_URL",
+    "DATABASE_URL",
+    "ADMIN_EMAIL",
+    "ADMIN_NAME",
+    "ADMIN_PASSWORD_HASH",
+    "ADMIN_RECOVERY_TOKEN",
+    "ADMIN_SESSION_SECRET",
+    "SMS_API_KEY",
+    "SMS_SENDER_ID",
+    "EMAIL_API_KEY"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
