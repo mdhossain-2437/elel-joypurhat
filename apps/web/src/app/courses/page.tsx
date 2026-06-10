@@ -32,7 +32,7 @@ export default async function CoursesPage() {
       <section className="section-light">
         <div className="site-container">
           <p className="kicker-light">কোর্স তালিকা</p>
-          <h1 className="hero-heading mt-5 max-w-5xl">সরকারি প্রকল্প থেকে ক্যারিয়ার কোর্স—শেখার পথ বেছে নিন।</h1>
+          <h1 className="hero-heading mt-5 max-w-5xl">সরকারি প্রকল্প থেকে <span className="accent">ক্যারিয়ার কোর্স</span>—শেখার পথ বেছে নিন।</h1>
           <p className="mt-6 max-w-3xl text-lg leading-8 text-zinc-700">
             ই-লার্নিং এন্ড আর্নিং জয়পুরহাট ব্রাঞ্চের চলমান ও আসন্ন কোর্সগুলো এখানে সাজানো আছে। নতুন সরকারি প্রকল্প, পেইড কোর্স বা ছোট কর্মশালা চালু হলে সেগুলোও এই তালিকায় যুক্ত হবে।
           </p>

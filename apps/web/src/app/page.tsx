@@ -116,7 +116,7 @@ export default async function Home() {
           <div className="flex flex-col justify-center">
             <p className="kicker-light">ই-লার্নিং এন্ড আর্নিং লিমিটেড / জয়পুরহাট ব্রাঞ্চ</p>
             <h1 className="hero-heading mt-5">
-              দক্ষতা শিখুন, নিজের ভবিষ্যৎ গড়ার পথে আত্মবিশ্বাস নিয়ে এগিয়ে যান।
+              দক্ষতা শিখুন, নিজের <span className="accent">ভবিষ্যৎ</span> গড়ার পথে আত্মবিশ্বাস নিয়ে এগিয়ে যান।
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-700">
               সরকারি প্রশিক্ষণ, পেইড কোর্স, ভর্তি নোটিশ, ফলাফল, শিক্ষক পরিচিতি ও ব্রাঞ্চ সহায়তা—জয়পুরহাট ব্রাঞ্চের প্রয়োজনীয় সব তথ্য এখন একটি নির্ভরযোগ্য প্ল্যাটফর্মে।
@@ -189,7 +189,7 @@ export default async function Home() {
           <div className="experience-pass-head">
             <div>
               <p className="kicker-light">শিক্ষার্থীর পথচলা</p>
-              <h2 className="section-heading mt-4">প্রথম আবেদন থেকে ক্লাসের অগ্রগতি—সব ধাপ যেন সামনে দেখা যায়।</h2>
+              <h2 className="section-heading mt-4">প্রথম আবেদন থেকে ক্লাসের <span className="accent">অগ্রগতি</span>—সব ধাপ যেন সামনে দেখা যায়।</h2>
             </div>
             <p>
               নতুন শিক্ষার্থীর সবচেয়ে বড় প্রয়োজন হলো পরিষ্কার নির্দেশনা। তাই ভর্তি, পরীক্ষা, ক্লাস, মূল্যায়ন ও সহায়তার তথ্য গল্পের মতো ধারাবাহিকভাবে সাজানো হয়েছে—আজ কী করবেন, আগামী ধাপে কী আসবে, কোথায় সাহায্য পাবেন।
@@ -214,7 +214,7 @@ export default async function Home() {
         <div className="site-container lesson-journey-grid">
           <div>
             <p className="kicker-light">লার্নিং জার্নি</p>
-            <h2 className="section-heading mt-4">ক্লাসের ভেতরের শেখাটা বাইরে থেকেও পরিষ্কার বোঝা যাবে।</h2>
+            <h2 className="section-heading mt-4">ক্লাসের ভেতরের <span className="accent">শেখাটা</span> বাইরে থেকেও পরিষ্কার বোঝা যাবে।</h2>
             <p className="mt-5 max-w-xl text-base leading-8 text-zinc-700">
               বিশ্বমানের কোর্স-জার্নি অভিজ্ঞতা থেকে অনুপ্রাণিত হয়ে এখানে শেখার ধাপগুলো পথচিত্র আকারে সাজানো হয়েছে, তবে সবকিছু জয়পুরহাট ব্রাঞ্চের বাস্তব প্রশিক্ষণ কাঠামোর সঙ্গে মিলিয়ে রাখা হয়েছে।
             </p>
@@ -261,7 +261,7 @@ export default async function Home() {
           <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
             <div>
               <p className="kicker-light">চলমান ও আসন্ন কোর্স</p>
-              <h2 className="section-heading mt-4">এক ব্রাঞ্চে শেখার অনেক পথ।</h2>
+              <h2 className="section-heading mt-4">এক ব্রাঞ্চে শেখার <span className="accent">অনেক পথ</span>।</h2>
             </div>
             <Link className="btn-black" href="/courses">
               সব কোর্স দেখুন
@@ -322,7 +322,7 @@ export default async function Home() {
               <h2>
                 শেখার{" "}
                 <br />
-                <span>পথচিত্র</span>
+                <span className="accent">পথচিত্র</span>
               </h2>
             </div>
             <p>
@@ -367,7 +367,7 @@ export default async function Home() {
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
             <div>
               <p className="kicker-light">শিক্ষার্থী সেবা</p>
-              <h2 className="section-heading mt-4">ভর্তি, নোটিশ ও ফলাফল—সবকিছু ঠিক জায়গায়।</h2>
+              <h2 className="section-heading mt-4">ভর্তি, নোটিশ ও <span className="accent">ফলাফল</span>—সবকিছু ঠিক জায়গায়।</h2>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
               {projectCards.map(([title, text]) => (

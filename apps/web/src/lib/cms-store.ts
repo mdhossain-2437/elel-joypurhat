@@ -1,7 +1,5 @@
 import "server-only";
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
 import type {
   AdmissionPopupSettings,
   AdmissionResultEntry,
@@ -16,8 +14,57 @@ import type {
   SuccessStoryEntry,
   TeamMemberEntry,
 } from "@/lib/cms-types";
+import seedStore from "@/data/cms-seed.json";
+import { ensureSchema, getPool, isDbConfigured } from "@/lib/db";
 
-const storePath = path.join(process.cwd(), "data", "cms-store.json");
+const DOCUMENT_ID = "primary";
+
+// Bundled seed guarantees public reads never fail, even before a database is
+// connected. It is also the source the seed script writes into Postgres.
+function cloneSeed(): CmsStore {
+  return structuredClone(seedStore as unknown as CmsStore);
+}
+
+// In-memory overlay used for local dev and any environment without a database.
+// On serverless this is per-instance and non-durable — connect DATABASE_URL for
+// real persistence. Reads still work everywhere because of the bundled seed.
+type GlobalWithStore = typeof globalThis & { __elelCmsStore?: CmsStore };
+
+function memoryStore(): CmsStore {
+  const globalForStore = globalThis as GlobalWithStore;
+  if (!globalForStore.__elelCmsStore) {
+    globalForStore.__elelCmsStore = cloneSeed();
+  }
+  return globalForStore.__elelCmsStore;
+}
+
+async function readFromDb(): Promise<CmsStore | null> {
+  const pool = getPool();
+  if (!pool) return null;
+  await ensureSchema();
+  const result = await pool.query<{ data: CmsStore }>(
+    "SELECT data FROM cms_document WHERE id = $1 LIMIT 1",
+    [DOCUMENT_ID],
+  );
+  if (result.rows.length === 0) {
+    const seeded = cloneSeed();
+    await writeToDb(seeded);
+    return seeded;
+  }
+  return result.rows[0].data;
+}
+
+async function writeToDb(store: CmsStore): Promise<void> {
+  const pool = getPool();
+  if (!pool) return;
+  await ensureSchema();
+  await pool.query(
+    `INSERT INTO cms_document (id, data, updated_at)
+     VALUES ($1, $2::jsonb, now())
+     ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+    [DOCUMENT_ID, JSON.stringify(store)],
+  );
+}
 
 const defaultAdmissionPopup: AdmissionPopupSettings = {
   enabled: true,
@@ -52,15 +99,26 @@ function newId(prefix: string) {
 }
 
 export async function readCmsStore(): Promise<CmsStore> {
-  const raw = await readFile(storePath, "utf8");
-  const store = JSON.parse(raw) as CmsStore;
-  return normalizeStore(store);
+  if (isDbConfigured) {
+    try {
+      const store = await readFromDb();
+      if (store) return normalizeStore(store);
+    } catch (error) {
+      console.error("[cms] database read failed, serving bundled seed", error);
+      return normalizeStore(cloneSeed());
+    }
+  }
+  return normalizeStore(memoryStore());
 }
 
 export async function writeCmsStore(store: CmsStore) {
-  await mkdir(path.dirname(storePath), { recursive: true });
   store.updatedAt = now();
-  await writeFile(storePath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
+  if (isDbConfigured) {
+    await writeToDb(store);
+    return store;
+  }
+  const globalForStore = globalThis as GlobalWithStore;
+  globalForStore.__elelCmsStore = store;
   return store;
 }
 

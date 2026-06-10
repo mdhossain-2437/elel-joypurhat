@@ -6,12 +6,33 @@
   --muted: #a3a3a3;
   --line: rgba(255, 255, 255, 0.12);
   --orange: #ff5a1f;
+  --orange-deep: #e6480f;
   --green: #118040;
+  --green-deep: #0c6231;
   --cream: #f7f4ef;
   --white: #ffffff;
   --ink: #111111;
   --soft: #f2eee7;
   --acid: #b6ff00;
+
+  /* Premium uplift tokens */
+  --gold: #c9a227;
+  --paper: #fbf9f5;
+  --ring: rgba(17, 17, 17, 0.08);
+  --ring-strong: rgba(17, 17, 17, 0.12);
+  --shadow-sm: 0 2px 8px -3px rgba(17, 17, 17, 0.18);
+  --shadow-md: 0 18px 50px -34px rgba(17, 17, 17, 0.42);
+  --shadow-lg: 0 40px 110px -60px rgba(17, 17, 17, 0.55);
+  --shadow-orange: 0 22px 60px -28px rgba(255, 90, 31, 0.55);
+  --grad-brand: linear-gradient(135deg, var(--orange), var(--orange-deep));
+  --grad-green: linear-gradient(135deg, var(--green), var(--green-deep));
+  --grad-mesh:
+    radial-gradient(circle at 12% 18%, rgba(255, 90, 31, 0.12), transparent 42%),
+    radial-gradient(circle at 88% 8%, rgba(17, 128, 64, 0.12), transparent 40%),
+    radial-gradient(circle at 50% 120%, rgba(201, 162, 39, 0.1), transparent 55%);
+  --radius: 16px;
+  --radius-lg: 22px;
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @theme inline {
@@ -19,12 +40,15 @@
   --color-foreground: var(--foreground);
   --font-sans: "Geist", "Geist Fallback", "Noto Sans Bengali", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  --font-display: var(--font-display), "Noto Sans Bengali", serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), var(--font-bangla), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 html {
@@ -3839,4 +3863,376 @@ textarea {
   .admission-popup-actions button {
     width: 100%;
   }
+}
+
+/* =====================================================================
+   PREMIUM UPLIFT LAYER
+   Elevates the existing cream/green/orange identity with a refined type
+   scale, depth, gradient meshes, glassmorphism and motion. Built on the
+   existing class vocabulary so it cascades across every page.
+   ===================================================================== */
+
+/* Serif-italic display accent (designmonks/devmonks signature). Apply to a
+   word inside a heading: <span class="accent">পথচিত্র</span> */
+.accent,
+.section-heading .accent,
+.hero-heading .accent,
+.architecture-head h1 span.accent,
+.architecture-head h2 span.accent {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-inline: 0.04em;
+}
+
+.hero-heading,
+.section-heading {
+  letter-spacing: -0.02em;
+}
+
+/* ---- Refined buttons: gradient, depth, sheen ---- */
+.btn-orange {
+  position: relative;
+  overflow: hidden;
+  background: var(--grad-brand);
+  box-shadow: var(--shadow-orange);
+  letter-spacing: 0.01em;
+}
+
+.btn-orange::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+  transform: translateX(-130%);
+  transition: transform 620ms var(--ease-premium);
+}
+
+.btn-orange:hover::after {
+  transform: translateX(130%);
+}
+
+.btn-black,
+.button-primary {
+  background: linear-gradient(135deg, #1d1d1b, #050505);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-orange,
+.btn-black,
+.btn-dark,
+.button-primary,
+.button-secondary {
+  transition: transform 260ms var(--ease-premium), box-shadow 260ms var(--ease-premium),
+    background 260ms var(--ease-premium);
+}
+
+.btn-orange:hover,
+.btn-black:hover,
+.btn-dark:hover,
+.button-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-orange:active,
+.btn-black:active,
+.button-primary:active {
+  transform: translateY(0);
+}
+
+/* ---- Kicker: refined pill ---- */
+.kicker,
+.kicker-light {
+  gap: 9px;
+  padding: 6px 13px 6px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(184, 66, 21, 0.18);
+  background: linear-gradient(135deg, rgba(255, 90, 31, 0.1), rgba(255, 90, 31, 0.03));
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(6px);
+}
+
+.kicker::before,
+.kicker-light::before {
+  box-shadow: 0 0 0 4px rgba(255, 90, 31, 0.16);
+}
+
+/* ---- Hero: mesh gradient, grain, depth ---- */
+.global-hero {
+  background:
+    var(--grad-mesh),
+    linear-gradient(180deg, var(--cream), #ffffff);
+}
+
+.global-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(17, 17, 17, 0.045) 1px, transparent 1px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(circle at 50% 0%, #000, transparent 72%);
+  mask-image: radial-gradient(circle at 50% 0%, #000, transparent 72%);
+  pointer-events: none;
+}
+
+.global-hero-board {
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(26px) saturate(140%);
+  transition: transform 400ms var(--ease-premium);
+}
+
+.global-hero-board:hover {
+  transform: translateY(-4px);
+}
+
+.hero-stat {
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
+  transition: transform 260ms var(--ease-premium), box-shadow 260ms var(--ease-premium);
+}
+
+.hero-stat:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---- Cards: unified premium radius, depth, hover lift ---- */
+.hero-course-card,
+.mini-course-card,
+.course-tile,
+.experience-pass-card,
+.lesson-rail-card,
+.workflow-card,
+.scroll-card,
+.service-card,
+.result-link-card,
+.contact-card,
+.notice-card,
+.story-marquee-card,
+.story-index-card,
+.flow-panel,
+.panel-light {
+  border-radius: var(--radius);
+  border-color: var(--ring);
+  transition: transform 320ms var(--ease-premium), box-shadow 320ms var(--ease-premium),
+    border-color 320ms var(--ease-premium);
+}
+
+.course-tile,
+.service-card,
+.result-link-card,
+.mini-course-card,
+.notice-card {
+  box-shadow: var(--shadow-sm);
+}
+
+.course-tile:hover,
+.service-card:hover,
+.result-link-card:hover,
+.mini-course-card:hover,
+.notice-card:hover,
+.experience-pass-card:hover,
+.lesson-rail-card:hover,
+.contact-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(255, 90, 31, 0.32);
+}
+
+/* Subtle gradient wash that fades in on interactive cards */
+.course-tile,
+.result-link-card,
+.service-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.course-tile::before,
+.result-link-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(160deg, rgba(255, 90, 31, 0.07), rgba(17, 128, 64, 0.05));
+  opacity: 0;
+  transition: opacity 320ms var(--ease-premium);
+}
+
+.course-tile:hover::before,
+.result-link-card:hover::before {
+  opacity: 1;
+}
+
+.result-link-card svg,
+.service-card svg,
+.course-tile svg {
+  transition: transform 320ms var(--ease-premium);
+}
+
+.result-link-card:hover svg,
+.service-card:hover svg,
+.course-tile:hover svg {
+  transform: scale(1.08) rotate(-3deg);
+}
+
+/* ---- Proof strip: animated marquee feel on hover ---- */
+.proof-item {
+  border-radius: 12px;
+  transition: transform 240ms var(--ease-premium), background 240ms var(--ease-premium),
+    color 240ms var(--ease-premium);
+}
+
+.proof-item:hover {
+  transform: translateY(-2px);
+  background: var(--grad-green);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* ---- Section rhythm + soft separators ---- */
+.section-white,
+.section-light {
+  position: relative;
+}
+
+.experience-pass-section,
+.lesson-journey-section {
+  background:
+    radial-gradient(circle at 85% -10%, rgba(17, 128, 64, 0.06), transparent 45%),
+    var(--cream);
+}
+
+/* ---- Architecture rows: hover highlight ---- */
+.architecture-row {
+  transition: background 300ms var(--ease-premium);
+  border-radius: 14px;
+}
+
+.architecture-row:hover {
+  background: linear-gradient(135deg, rgba(255, 90, 31, 0.05), transparent 60%);
+}
+
+/* ---- Footer polish ---- */
+.proof-strip {
+  background: linear-gradient(180deg, #ffffff, var(--paper));
+}
+
+/* ---- Reveal-on-scroll (progressive enhancement; safe without JS) ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    animation: reveal-up 760ms var(--ease-premium) forwards;
+    animation-timeline: view();
+    animation-range: entry 0% cover 28%;
+  }
+}
+
+@keyframes reveal-up {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- Focus-visible accessibility ring ---- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ---- Custom selection + scrollbar ---- */
+::selection {
+  background: rgba(255, 90, 31, 0.22);
+  color: #111;
+}
+
+@supports (scrollbar-color: auto) {
+  html {
+    scrollbar-color: rgba(255, 90, 31, 0.5) transparent;
+  }
+}
+
+/* ---- Admin dashboard premium polish ---- */
+.admin-tabbar {
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(14px);
+}
+
+.admin-tabbar button {
+  transition: background 220ms var(--ease-premium), color 220ms var(--ease-premium),
+    transform 220ms var(--ease-premium);
+}
+
+.admin-tabbar button:hover {
+  background: rgba(17, 128, 64, 0.08);
+  color: #0c6231;
+}
+
+.admin-tabbar button.active {
+  background: var(--grad-green);
+  box-shadow: 0 14px 30px -18px rgba(12, 98, 49, 0.8);
+}
+
+.admin-metric-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: transform 300ms var(--ease-premium), box-shadow 300ms var(--ease-premium);
+}
+
+.admin-metric-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--grad-brand);
+  opacity: 0.85;
+}
+
+.admin-metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.admin-data-table tbody tr {
+  transition: background 200ms var(--ease-premium);
+}
+
+.admin-data-table tbody tr:hover td {
+  background: rgba(255, 90, 31, 0.045);
+}
+
+.admin-table-shell,
+.admin-wide-panel,
+.admin-panel.premium {
+  border-radius: var(--radius);
 }

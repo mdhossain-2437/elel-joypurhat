@@ -29,7 +29,7 @@ export default async function SuccessStoriesPage({ searchParams }: StoriesPagePr
       <section className="story-index-hero">
         <div className="site-container story-index-head">
           <p className="kicker-light">শিক্ষার্থীদের গল্প</p>
-          <h1 className="hero-heading mt-5 max-w-5xl">শেখার গল্পগুলো শুধু ফলাফল নয়, প্রতিদিনের অগ্রগতির প্রমাণ।</h1>
+          <h1 className="hero-heading mt-5 max-w-5xl">শেখার গল্পগুলো শুধু ফলাফল নয়, প্রতিদিনের <span className="accent">অগ্রগতির</span> প্রমাণ।</h1>
           <p className="mt-6 max-w-3xl text-lg leading-8 text-zinc-700">
             নিয়মিত ক্লাস, ল্যাব অনুশীলন, প্রশিক্ষকের ফিডব্যাক ও নিজের চেষ্টা মিলিয়ে শিক্ষার্থীরা কীভাবে এগোচ্ছে—এই পেজে সেই গল্পগুলো সংরক্ষণ করা হয়েছে।
           </p>

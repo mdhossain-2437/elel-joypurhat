@@ -17,7 +17,7 @@ export default async function NoticesPage() {
       <section className="section-light">
         <div className="site-container">
           <p className="kicker-light">অফিসিয়াল নোটিশ</p>
-          <h1 className="hero-heading mt-5 max-w-5xl">ভর্তি, পরীক্ষা ও ফলাফলের গুরুত্বপূর্ণ আপডেট।</h1>
+          <h1 className="hero-heading mt-5 max-w-5xl">ভর্তি, পরীক্ষা ও <span className="accent">ফলাফলের</span> গুরুত্বপূর্ণ আপডেট।</h1>
           <p className="mt-6 max-w-3xl text-lg leading-8 text-zinc-700">
             জয়পুরহাট ব্রাঞ্চের চলমান নোটিশগুলো এখানে প্রকাশ করা হয়। ভর্তি, পরীক্ষা, ফলাফল, নতুন কোর্স ঘোষণা বা প্রকল্প আপডেট—সব গুরুত্বপূর্ণ তথ্য এই পেজে পাওয়া যাবে।
           </p>

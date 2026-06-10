@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Sans_Bengali } from "next/font/google";
+import { Fraunces, Geist, Geist_Mono, Noto_Sans_Bengali } from "next/font/google";
 import { AdmissionPopup } from "@/components/admission-popup";
 import { StructuredData } from "@/components/structured-data";
 import { SiteFooter } from "@/components/site-footer";
@@ -21,6 +21,13 @@ const notoBangla = Noto_Sans_Bengali({
   variable: "--font-bangla",
   subsets: ["bengali"],
   weight: ["400", "500", "600", "700", "800", "900"],
+});
+
+const fraunces = Fraunces({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["italic", "normal"],
 });
 
 const baseOpenGraph = {
@@ -112,7 +119,8 @@ export default async function RootLayout({
   return (
     <html
       lang="bn"
-      className={`${geistSans.variable} ${geistMono.variable} ${notoBangla.variable} h-full antialiased`}
+      data-scroll-behavior="smooth"
+      className={`${geistSans.variable} ${geistMono.variable} ${notoBangla.variable} ${fraunces.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>

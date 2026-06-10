@@ -27,7 +27,7 @@ export default function ResultsPage() {
       <section className="results-hub-hero">
         <div className="site-container results-hub-head">
           <p className="kicker-light">ফলাফল পোর্টাল</p>
-          <h1 className="hero-heading mt-5 max-w-5xl">নিজের ফলাফল দেখার জন্য সঠিক বিভাগ বেছে নিন।</h1>
+          <h1 className="hero-heading mt-5 max-w-5xl">নিজের <span className="accent">ফলাফল</span> দেখার জন্য সঠিক বিভাগ বেছে নিন।</h1>
           <p className="mt-6 max-w-3xl text-lg leading-8 text-zinc-700">
             এখানে কোনো পাবলিক মেরিট তালিকা দেখানো হয় না। রোল, ফোন, ব্যাচ বা ল্যাবের তথ্য মিললে শুধু নিজের ফলাফল দেখা যাবে।
           </p>

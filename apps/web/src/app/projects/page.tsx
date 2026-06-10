@@ -120,7 +120,7 @@ export default function ProjectsPage() {
           <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
             <div>
               <p className="kicker-light">সিস্টেম মডিউল</p>
-              <h2 className="section-heading mt-4">ব্রাঞ্চ পরিচালনার প্রয়োজনীয় কাজ এক পরিচ্ছন্ন সিস্টেমে।</h2>
+              <h2 className="section-heading mt-4">ব্রাঞ্চ পরিচালনার প্রয়োজনীয় কাজ এক <span className="accent">পরিচ্ছন্ন সিস্টেমে</span>।</h2>
             </div>
             <p className="max-w-xl text-sm leading-6 text-zinc-600">
               এখানে শুধু প্রকল্পের তালিকা নয়; ভর্তি, নোটিশ, প্রশিক্ষণ, ফলাফল ও কনটেন্ট নিয়ন্ত্রণের পুরো কাজের ধারা দেখানো হয়েছে।
