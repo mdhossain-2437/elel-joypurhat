@@ -10,7 +10,11 @@ export const ADMIN_COOKIE = "elel_admin_session";
 const sessionTtlSeconds = 60 * 60 * 8;
 const secret = process.env.ADMIN_SESSION_SECRET || "elel-joypurhat-local-dev-secret-change-me";
 const bootstrapAdminEmail = process.env.ADMIN_EMAIL?.trim();
-const bootstrapAdminPasswordHash = process.env.ADMIN_PASSWORD_HASH?.trim();
+// Tolerate accidental escaping/whitespace when the hash is pasted into env UIs.
+// A valid pbkdf2 hash is `pbkdf2$iter$salt$hash` (base64url parts), so it never
+// contains backslashes or spaces — stripping them fixes the common ".env vs
+// dashboard" paste mistake (e.g. `pbkdf2\$210000\$...`) without changing valid input.
+const bootstrapAdminPasswordHash = process.env.ADMIN_PASSWORD_HASH?.replace(/[\\\s]/g, "");
 const recoveryToken = process.env.ADMIN_RECOVERY_TOKEN?.trim();
 
 export type AdminSession = {
