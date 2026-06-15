@@ -4,8 +4,10 @@ import { AdmissionPopup } from "@/components/admission-popup";
 import { StructuredData } from "@/components/structured-data";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { ScrollProgress } from "@/components/ambient";
 import { readCmsStore } from "@/lib/cms-store";
 import "./globals.css";
+import "./v2.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -118,7 +120,13 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js');",
+          }}
+        />
         <StructuredData />
+        <ScrollProgress />
         <SiteHeader />
         <AdmissionPopup popup={popup} />
         <div className="flex-1">{children}</div>

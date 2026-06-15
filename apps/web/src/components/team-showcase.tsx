@@ -1,11 +1,12 @@
 import Image from "next/image";
 import { team } from "@/lib/content";
 import type { TeamMemberEntry } from "@/lib/cms-types";
+import { Reveal } from "@/components/motion";
 
 export function TeamShowcase({
-  title = "জয়পুরহাট ব্রাঞ্চের দায়িত্বশীল টিম",
+  title = "জয়পুরহাট ব্রাঞ্চের দায়িত্বশীল টিম",
   eyebrow = "আমাদের টিম",
-  description = "ভর্তি সহায়তা, ক্লাস পরিচালনা, প্রশিক্ষণ ও শিক্ষার্থীদের নিয়মিত পাশে থাকার কাজে আমাদের টিম দায়িত্ব নিয়ে কাজ করছে।",
+  description = "ভর্তি সহায়তা, ক্লাস পরিচালনা, প্রশিক্ষণ ও শিক্ষার্থীদের নিয়মিত পাশে থাকার কাজে আমাদের টিম দায়িত্ব নিয়ে কাজ করছে।",
   members,
 }: {
   title?: string;
@@ -38,43 +39,55 @@ export function TeamShowcase({
       }));
 
   return (
-    <section id="team" className="section-light team-showcase">
-      <div className="site-container">
-        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+    <section id="team" className="v2-section">
+      <div className="v2-container">
+        <div className="v2-section-head split">
           <div>
-            <p className="kicker-light">{eyebrow}</p>
-            <h2 className="section-heading mt-4">{title}</h2>
+            <Reveal>
+              <span className="v2-eyebrow">{eyebrow}</span>
+            </Reveal>
+            <Reveal delay={80}>
+              <h2 className="v2-h2 font-display" style={{ marginTop: 18 }}>
+                {title}
+              </h2>
+            </Reveal>
           </div>
-          <p className="max-w-xl text-sm leading-6 text-zinc-600">{description}</p>
+          <Reveal delay={140}>
+            <p className="v2-lead">{description}</p>
+          </Reveal>
         </div>
 
-        <div className="team-lead-grid mt-10">
-          {officers.map((person) => (
-            <article key={person.id} className="team-card team-card-large">
-              <div className="team-photo">
-                <Image src={person.image} alt={person.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
-              </div>
-              <div>
-                <span>{person.org}</span>
-                <h3>{person.name}</h3>
-                <p>{person.role}</p>
-              </div>
-            </article>
+        <div className="v2-team-grid">
+          {officers.map((person, index) => (
+            <Reveal key={person.id} delay={index * 70} y={30}>
+              <article className="v2-person">
+                <div className="ph">
+                  <Image src={person.image} alt={person.name} fill sizes="(max-width: 768px) 50vw, 33vw" />
+                </div>
+                <div className="info">
+                  <span>{person.org}</span>
+                  <h3>{person.name}</h3>
+                  <p>{person.role}</p>
+                </div>
+              </article>
+            </Reveal>
           ))}
         </div>
 
-        <div className="team-trainer-grid mt-5">
-          {trainers.map((person) => (
-            <article key={person.id} className="team-card">
-              <div className="team-photo trainer-photo">
-                <Image src={person.image} alt={person.name} fill sizes="(max-width: 768px) 50vw, 20vw" className="object-cover" />
-              </div>
-              <div>
-                <span>প্রশিক্ষণ টিম</span>
-                <h3>{person.name}</h3>
-                <p>{person.role}</p>
-              </div>
-            </article>
+        <div className="v2-team-grid trainers" style={{ marginTop: 16 }}>
+          {trainers.map((person, index) => (
+            <Reveal key={person.id} delay={index * 60} y={26}>
+              <article className="v2-person">
+                <div className="ph">
+                  <Image src={person.image} alt={person.name} fill sizes="(max-width: 768px) 50vw, 20vw" />
+                </div>
+                <div className="info">
+                  <span>প্রশিক্ষণ টিম</span>
+                  <h3>{person.name}</h3>
+                  <p>{person.role}</p>
+                </div>
+              </article>
+            </Reveal>
           ))}
         </div>
       </div>
